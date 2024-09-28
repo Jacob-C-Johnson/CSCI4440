@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+in vec4 aPosition;  // Expecting vec4 positions
+in vec4 aColor;     // Expecting vec4 colors
+out vec4 vColor;    // Pass color to the fragment shader
+
+void main() {
+    gl_Position = aPosition; // Set the position for the vertex
+    vColor = aColor;         // Pass the color to the fragment shader
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+precision mediump float;
+
+in vec4 vColor;    // Receive color from the vertex shader
+out vec4 fragColor;
+
+void main() {
+    fragColor = vColor;  // Output the color
+}
+</script>
+
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="Practice3_08.js"></script>
+
+<body>
+    <canvas id="gl-canvas" width="512" height="512">
+        Oops ... your browser doesn't support the HTML5 canvas element
+    </canvas>
+</body>
+</html>

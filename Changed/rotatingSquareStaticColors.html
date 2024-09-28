@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Rotating Square</title>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+
+in vec4 aPosition;
+uniform float uTheta;
+
+void main() {
+    float s = sin(uTheta);
+    float c = cos(uTheta);
+
+    gl_Position.x = -s * aPosition.y + c * aPosition.x;
+    gl_Position.y =  s * aPosition.x + c * aPosition.y;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+precision mediump float;
+
+out vec4 fragColor;
+
+void main() {
+    // Normalize the fragment coordinates to a range of [0.0, 1.0]
+    vec2 normalizedPos = gl_FragCoord.xy / vec2(512.0, 512.0); // Assuming canvas size is 512x512
+    
+    // Use the normalized position to generate color
+    // For example, vary red with x and green with y
+    float red = normalizedPos.x;  // Red varies across the x-axis
+    float green = normalizedPos.y; // Green varies across the y-axis
+    float blue = 1.0 - normalizedPos.x; // Blue is inverse of x
+    
+    // Set the fragment color
+    fragColor = vec4(red, green, blue, 1.0);
+}
+</script>
+
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MVnew.js"></script>
+<script type="text/javascript" src="rotatingSquareStaticColors.js"></script>
+</head>
+
+<body>
+<canvas id="gl-canvas" width="512" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</body>
+</html>

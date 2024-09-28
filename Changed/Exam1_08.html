@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+
+in vec3 aPosition;
+in vec4 aColor;
+uniform float uTheta;
+
+out vec4 vColor;
+
+void main()
+{
+    vColor = aColor;
+
+    float s = sin(uTheta);
+    float c = cos(uTheta);
+
+    gl_Position.x = -s*aPosition.y + c*aPosition.x;
+    gl_Position.y =  s*aPosition.x + c*aPosition.y;
+    gl_Position.z = 0.0;
+    gl_Position.w = 1.0;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+
+precision mediump float;
+in vec4 vColor;
+uniform float uPosColor;
+
+out vec4 fColor;
+
+void main()
+{
+    if (uPosColor == 1.0)
+    {
+        // Code from exapmles in class
+        // Normalize the fragment coords based on screen size
+        vec2 normalizedPos = gl_FragCoord.xy / vec2(512.0, 512.0);
+
+        float red = normalizedPos.x;  // Red varies across the x-axis
+        float green = normalizedPos.y; // Green varies across the y-axis
+        float blue = 1.0 - normalizedPos.x; // Blue is inverse of x
+        // Set the fragment color
+        fColor = vec4(red, green, blue, 1.0);
+    }
+    if (uPosColor == 0.0) 
+    {
+        fColor = vColor;
+    }
+    
+}
+</script>
+
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MVnew.js"></script>
+<script type="text/javascript" src="Exam1_08.js"></script>
+</head>
+
+<body>
+<select id="Controls" size="4">
+    <option value="0">Pause</option>
+    <option value="1">Direction</option>
+    <option value="2">Faster</option>
+    <option value="3">Slower</option>
+</select>
+
+<button id="Color">Color change</button>
+
+<canvas id="gl-canvas" width="512" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</body>
+</html>
