@@ -20,6 +20,7 @@ var uMatrixLoc;
 
 var nebula = 1;
 var star = 0;
+var planets = 0;
 
 window.onload = function init()
 {
@@ -66,21 +67,26 @@ window.onload = function init()
             case 0:
                 nebula = 1;
                 star = 0;
+                planets = 0;
                 break;
             case 1:
                 nebula = 0;
                 star = 1;
+                planets = 0;
                 break;
             case 2:
+                nebula = 0;
+                star = 1;
+                planets = 1;
                 break;
             case 3:
-                break;
-            case 4:
-                // alternate pause between 0 and 1
-                pause = 1 - pause;
-                break;
-                
+                break; 
         }
+    };
+
+    // Pause button
+    document.getElementById("pause").onclick = function() {
+        pause = 1 - pause;
     };
 
     render();
@@ -99,14 +105,14 @@ function colorCube()
 function quad(a, b, c, d)
 {
     var vertices = [
-        vec4(-0.5, -0.5,  0.5, 1.0),
-        vec4(-0.5,  0.5,  0.5, 1.0),
-        vec4(0.5,  0.5,  0.5, 1.0),
-        vec4(0.5, -0.5,  0.5, 1.0),
-        vec4(-0.5, -0.5, -0.5, 1.0),
-        vec4(-0.5,  0.5, -0.5, 1.0),
-        vec4(0.5,  0.5, -0.5, 1.0),
-        vec4(0.5, -0.5, -0.5, 1.0)
+        vec4(-0.3, -0.3,  0.3, 1.0),
+        vec4(-0.3,  0.3,  0.3, 1.0),
+        vec4(0.3,  0.3,  0.3, 1.0),
+        vec4(0.3, -0.3,  0.3, 1.0),
+        vec4(-0.3, -0.3, -0.3, 1.0),
+        vec4(-0.3,  0.3, -0.3, 1.0),
+        vec4(0.3,  0.3, -0.3, 1.0),
+        vec4(0.3, -0.3, -0.3, 1.0)
     ];
 
     var vertexColors = [
@@ -153,11 +159,29 @@ function render()
     modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis]));
     modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
 
-    // Translate the center of the cube back to its original position
+    // send matrix to shader
     gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
 
-
+    drawCube();
+    
     // Draw the cube wireframe if nebula is selected
+    if (planets == 1) {
+        modelViewMatrix = mat4(); 
+        
+        modelViewMatrix = mult(modelViewMatrix, translate(0.5, 0.5, 0));
+
+        var r = rotateX(theta[xAxis]);
+        modelViewMatrix = mult(modelViewMatrix, r);
+
+
+        gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
+        drawCube();
+    }
+
+    requestAnimationFrame( render );
+}
+
+function drawCube() {
     if (nebula == 1) {
         // For loop to draw each face of the cube
         for (var i = 0; i < positions.length; i += 4)
@@ -172,7 +196,4 @@ function render()
             gl.drawArrays( gl.TRIANGLE_FAN, i, 4);
         }
     }
-    
-
-    requestAnimationFrame( render );
 }
