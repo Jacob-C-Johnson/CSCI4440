@@ -4,13 +4,13 @@ var canvas;
 var gl;
 
 var numPositions  = 36;
-
 var positions = [];
 var colors = [];
 
 var xAxis = 0;
 var yAxis = 1;
 var zAxis = 2;
+var pause = 1;
 
 var axis = 0;
 var theta = [0.1, 0.1, 0.1];
@@ -72,6 +72,12 @@ window.onload = function init()
                 star = 1;
                 break;
             case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                // alternate pause between 0 and 1
+                pause = 1 - pause;
                 break;
                 
         }
@@ -136,9 +142,9 @@ function render()
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // Rotate the square
-    theta[xAxis] += 0.4;
-    theta[yAxis] += 0.3;
-    theta[zAxis] += 0.2;
+    theta[xAxis] += 0.4 * pause;
+    theta[yAxis] += 0.3 * pause;
+    theta[zAxis] += 0.2 * pause;
 
     var modelViewMatrix = mat4();
 
