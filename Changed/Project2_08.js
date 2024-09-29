@@ -3,7 +3,7 @@
 var canvas;
 var gl;
 
-var numPositions  = 24;
+var numPositions  = 36;
 
 var positions = [];
 var colors = [];
@@ -17,6 +17,9 @@ var theta = [0.1, 0.1, 0.1];
 
 var thetaLoc;
 var uMatrixLoc;
+
+var nebula = 1;
+var star = 0;
 
 window.onload = function init()
 {
@@ -42,14 +45,13 @@ window.onload = function init()
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
-    var colorLoc =gl.getAttribLocation( program, "aColor");
+    var colorLoc = gl.getAttribLocation( program, "aColor");
     gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(colorLoc);
 
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(positions), gl.STATIC_DRAW);
-
 
     var positionLoc = gl.getAttribLocation( program, "aPosition");
     gl.vertexAttribPointer(positionLoc, 4, gl.FLOAT, false, 0, 0);
@@ -58,16 +60,21 @@ window.onload = function init()
     // Grab Location for motel view matrix
     uMatrixLoc = gl.getUniformLocation(program, "uModelViewMatrix");
 
-    //event listeners for buttons
-
-    document.getElementById( "xButton" ).onclick = function () {
-        axis = xAxis;
-    };
-    document.getElementById( "yButton" ).onclick = function () {
-        axis = yAxis;
-    };
-    document.getElementById( "zButton" ).onclick = function () {
-        axis = zAxis;
+    // menu controls
+    document.getElementById("controls" ).onclick = function(event) {
+        switch(event.target.index) {
+            case 0:
+                nebula = 1;
+                star = 0;
+                break;
+            case 1:
+                nebula = 0;
+                star = 1;
+                break;
+            case 2:
+                break;
+                
+        }
     };
 
     render();
@@ -112,7 +119,6 @@ function quad(a, b, c, d)
     // triangles from the quad indices
 
     //vertex color assigned by the index of the vertex
-
     var indices = [ a, b, c, d];
 
     for ( var i = 0; i < indices.length; ++i ) {
@@ -121,8 +127,8 @@ function quad(a, b, c, d)
 
         // for solid colored faces use
         colors.push(vertexColors[a]);
-
     }
+
 }
 
 function render()
@@ -130,14 +136,11 @@ function render()
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // Rotate the square
-    theta[xAxis] += 0.1;
-    theta[yAxis] += 0.1;
-    theta[zAxis] += 0.1;
+    theta[xAxis] += 0.4;
+    theta[yAxis] += 0.3;
+    theta[zAxis] += 0.2;
 
     var modelViewMatrix = mat4();
-
-    // Translate the center of the cube to the origin
-    //modelViewMatrix = mult(modelViewMatrix, translate(-0.5, -0.5, -0.5));
 
     // Apply rotations
     modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis]));
@@ -145,18 +148,25 @@ function render()
     modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
 
     // Translate the center of the cube back to its original position
-    //modelViewMatrix = mult(modelViewMatrix, translate(0.5, 0.5, 0.5));
     gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
 
 
+    // Draw the cube wireframe if nebula is selected
+    if (nebula == 1) {
+        // For loop to draw each face of the cube
+        for (var i = 0; i < positions.length; i += 4)
+        {
+            gl.drawArrays( gl.LINE_LOOP, i, 4);
+        }
+    }
+    // Draw cube solid faces if star has been slected
+    if (star == 1) {
+        for (var i = 0; i < positions.length; i += 4)
+        {
+            gl.drawArrays( gl.TRIANGLE_FAN, i, 4);
+        }
+    }
+    
 
-    // DRAW CUBES FACES INDIVIDUALLY
-    gl.drawArrays( gl.LINE_LOOP, 0, 4);
-    gl.drawArrays( gl.LINE_LOOP, 4, 4);
-    gl.drawArrays( gl.LINE_LOOP, 8, 4);
-    gl.drawArrays( gl.LINE_LOOP, 12, 4);
-    gl.drawArrays( gl.LINE_LOOP, 16, 4);
-    gl.drawArrays( gl.LINE_LOOP, 20, 4);
-    gl.drawArrays( gl.LINE_LOOP, 24, 4);
     requestAnimationFrame( render );
 }

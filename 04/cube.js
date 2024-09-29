@@ -15,8 +15,6 @@ var zAxis = 2;
 var axis = 0;
 var theta = [0, 0, 0];
 
-var toggle = [1, 1, 1];
-
 var thetaLoc;
 
 window.onload = function init()
@@ -69,11 +67,6 @@ window.onload = function init()
     document.getElementById( "zButton" ).onclick = function () {
         axis = zAxis;
     };
-    document.getElementById( "direction" ).onclick = function () {};
-    document.getElementById( "pause" ).onclick = function () {
-        toggle = [0, 0, 0];
-    };
-    document.getElementById( "color" ).onclick = function () {};
 
     render();
 }
@@ -103,7 +96,7 @@ function quad(a, b, c, d)
 
     var vertexColors = [
         vec4(0.0, 0.0, 0.0, 1.0),  // black
-        vec4(1.0, 0.0, 0.0, 1.0),  // red
+        vec4(0.5, 0.0, 0.5, 1.0),  // purple
         vec4(1.0, 1.0, 0.0, 1.0),  // yellow
         vec4(0.0, 1.0, 0.0, 1.0),  // green
         vec4(0.0, 0.0, 1.0, 1.0),  // blue
@@ -133,8 +126,8 @@ function render()
 {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    theta[axis] += 2.0;
-    gl.uniform3fv(thetaLoc, theta * toggle);
+    theta[axis] += 1.0;
+    gl.uniform3fv(thetaLoc, theta);
 
     gl.drawArrays(gl.TRIANGLES, 0, numPositions);
     requestAnimationFrame(render);

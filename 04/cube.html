@@ -20,20 +20,20 @@ void main()
 
     // Remeber: thse matrices are column-major
     mat4 rx = mat4(1.0,  0.0,  0.0, 0.0,
-		    0.0,  c.x,  s.x, 0.0,
-		    0.0, -s.x,  c.x, 0.0,
-		    0.0,  0.0,  0.0, 1.0);
+    0.0,  c.x,  s.x, 0.0,
+    0.0, -s.x,  c.x, 0.0,
+    0.0,  0.0,  0.0, 1.0);
 
     mat4 ry = mat4(c.y, 0.0, -s.y, 0.0,
-		    0.0, 1.0,  0.0, 0.0,
-		    s.y, 0.0,  c.y, 0.0,
-		    0.0, 0.0,  0.0, 1.0);
+    0.0, 1.0,  0.0, 0.0,
+    s.y, 0.0,  c.y, 0.0,
+    0.0, 0.0,  0.0, 1.0);
 
 
     mat4 rz = mat4(c.z, s.z, 0.0, 0.0,
-		    -s.z,  c.z, 0.0, 0.0,
-		    0.0,  0.0, 1.0, 0.0,
-		    0.0,  0.0, 0.0, 1.0);
+    -s.z,  c.z, 0.0, 0.0,
+    0.0,  0.0, 1.0, 0.0,
+    0.0,  0.0, 0.0, 1.0);
 
     vColor = aColor;
     gl_Position = rz * ry * rx * aPosition;
@@ -70,9 +70,6 @@ Oops ... your browser doesn't support the HTML5 canvas element
 <button id= "xButton">Rotate X</button>
 <button id= "yButton">Rotate Y</button>
 <button id= "zButton">Rotate Z</button>
-<button id= "direction">Direction</button>
-<button id= "pause">Pause</button>
-<button id= "color">Color</button>
 
 </body>
 </html>
