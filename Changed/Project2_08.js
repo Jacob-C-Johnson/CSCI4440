@@ -3,11 +3,13 @@
 var canvas;
 var gl;
 
+// positions and colors varibles
 var numPositions  = 36;
 var positions = [];
 var solidColors = [];
 var interpColors = [];
 
+//axis of rotation varibles
 var xAxis = 0;
 var yAxis = 1;
 var zAxis = 2;
@@ -16,9 +18,11 @@ var pause = 1;
 var axis = 0;
 var theta = [0.1, 0.1, 0.1];
 
+// vertex location varibles
 var thetaLoc;
 var uMatrixLoc;
 
+// varibles to conrol the menu states
 var nebula = 1;
 var star = 0;
 var planets = 0;
@@ -44,6 +48,7 @@ window.onload = function init()
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram(program);
 
+    // Create and bind buffers for colors and positions
     var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(solidColors), gl.STATIC_DRAW);
@@ -51,7 +56,7 @@ window.onload = function init()
     var colorLoc = gl.getAttribLocation( program, "aColor");
     gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(colorLoc);
-
+    
     var vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(positions), gl.STATIC_DRAW);
@@ -66,6 +71,7 @@ window.onload = function init()
     // menu controls
     document.getElementById("controls" ).onclick = function(event) {
         switch(event.target.index) {
+            // varibles control what the render function will draw via if statements
             case 0:
                 nebula = 1;
                 star = 0;
@@ -91,6 +97,7 @@ window.onload = function init()
                 solar = 1 - solar;
                 break; 
         }
+        // Change the color of the cube based on menu option
         if (solar == 0) {
             gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, flatten(solidColors), gl.STATIC_DRAW);
@@ -133,14 +140,14 @@ function quad(a, b, c, d)
     ];
 
     var vertexColors = [
-      vec4(0.0, 0.0, 0.0, 1.0),  // black
-      vec4(1.0, 0.0, 0.0, 1.0),  // red
-      vec4(1.0, 1.0, 0.0, 1.0),  // yellow
-      vec4(0.0, 1.0, 0.0, 1.0),  // green
-      vec4(0.0, 0.0, 1.0, 1.0),  // blue
-      vec4(1.0, 0.0, 1.0, 1.0),  // magenta
-      vec4(0.0, 1.0, 1.0, 1.0),  // cyan
-      vec4(1.0, 1.0, 1.0, 1.0)   // white
+        vec4(0.0, 0.0, 0.0, 1.0),  // black
+        vec4(0.5, 0.2, 0.3, 1.0),  // Dark purple
+        vec4(0.6, 0.0, 0.45, 1.0),  // maroon purple
+        vec4(0.9, 0.0, 0.4, 1.0),  // bright pink
+        vec4(0.3, 0.4, 0.2, 1.0),  // forest green
+        vec4(0.5, 0.0, 0.5, 1.0),  // Dark magenta
+        vec4(0.0, 0.5, 0.5, 1.0),  // Dark teal
+        vec4(1.0, 1.0, 1.0, 1.0)   // white
     ];
 
     // We need to parition the quad into two triangles in order for
@@ -151,6 +158,7 @@ function quad(a, b, c, d)
     var indices = [ a, b, c, d];
 
     for ( var i = 0; i < indices.length; ++i ) {
+        // send position and color data to the arrays
         positions.push(vertices[indices[i]]);
         interpColors.push( vertexColors[indices[i]] );
         solidColors.push(vertexColors[a]);
@@ -167,9 +175,10 @@ function render()
     theta[yAxis] += 0.3 * pause;
     theta[zAxis] += 0.2 * pause;
 
+    // new model view matrix for cube operations
     var modelViewMatrix = mat4();
 
-    // Apply rotations
+    // Apply rotations to show all six faces
     modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis]));
     modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis]));
     modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
@@ -177,9 +186,10 @@ function render()
     // send matrix to shader
     gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
 
+    // draw the cube
     drawCube();
     
-    // Draw the cube wireframe if nebula is selected
+    // Draw the planets if the plantetary formation is selected
     if (planets == 1) {
         drawPlanets();
     }
@@ -188,8 +198,8 @@ function render()
 }
 
 function drawCube() {
+    // Draw cube lines for wireframe
     if (nebula == 1) {
-        // For loop to draw each face of the cube
         for (var i = 0; i < positions.length; i += 4)
         {
             gl.drawArrays( gl.LINE_LOOP, i, 4);
@@ -204,6 +214,7 @@ function drawCube() {
     }
 }
 function drawPlanets() {
+    // information for the planets
     var numPlanets = 4;
     var planetScales = [0.6, 0.4, 0.35, 0.5];
     var planetDistances = [1.2, 0.9, 1.5, 1.7];
