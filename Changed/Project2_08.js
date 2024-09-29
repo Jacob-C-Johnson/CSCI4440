@@ -105,14 +105,14 @@ function colorCube()
 function quad(a, b, c, d)
 {
     var vertices = [
-        vec4(-0.3, -0.3,  0.3, 1.0),
-        vec4(-0.3,  0.3,  0.3, 1.0),
-        vec4(0.3,  0.3,  0.3, 1.0),
-        vec4(0.3, -0.3,  0.3, 1.0),
-        vec4(-0.3, -0.3, -0.3, 1.0),
-        vec4(-0.3,  0.3, -0.3, 1.0),
-        vec4(0.3,  0.3, -0.3, 1.0),
-        vec4(0.3, -0.3, -0.3, 1.0)
+        vec4(-0.25, -0.25,  0.25, 1.0),
+        vec4(-0.25,  0.25,  0.25, 1.0),
+        vec4(0.25,  0.25,  0.25, 1.0),
+        vec4(0.25, -0.25,  0.25, 1.0),
+        vec4(-0.25, -0.25, -0.25, 1.0),
+        vec4(-0.25,  0.25, -0.25, 1.0),
+        vec4(0.25,  0.25, -0.25, 1.0),
+        vec4(0.25, -0.25, -0.25, 1.0)
     ];
 
     var vertexColors = [
@@ -167,12 +167,17 @@ function render()
     // Draw the cube wireframe if nebula is selected
     if (planets == 1) {
         modelViewMatrix = mat4(); 
-        
-        modelViewMatrix = mult(modelViewMatrix, translate(0.5, 0.5, 0));
 
-        var r = rotateX(theta[xAxis]);
+        modelViewMatrix = mult(modelViewMatrix, scale(0.6, 0.6, 0.6));
+        
+        var r = rotateY(theta[yAxis])
         modelViewMatrix = mult(modelViewMatrix, r);
 
+        modelViewMatrix = mult(modelViewMatrix, translate(1.0, 0.0, 0));
+
+        modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis]));
+        modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis]));
+        modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
 
         gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
         drawCube();
