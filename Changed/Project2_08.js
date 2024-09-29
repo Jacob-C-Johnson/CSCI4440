@@ -94,7 +94,7 @@ window.onload = function init()
                 nebula = 0;
                 star = 1;
                 planets = 1;
-                solar = 1 - solar;
+                solar = 1;
                 break; 
         }
         // Change the color of the cube based on menu option
