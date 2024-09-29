@@ -5,7 +5,8 @@ var gl;
 
 var numPositions  = 36;
 var positions = [];
-var colors = [];
+var solidColors = [];
+var interpColors = [];
 
 var xAxis = 0;
 var yAxis = 1;
@@ -21,6 +22,7 @@ var uMatrixLoc;
 var nebula = 1;
 var star = 0;
 var planets = 0;
+var solar = 0;
 
 window.onload = function init()
 {
@@ -44,7 +46,7 @@ window.onload = function init()
 
     var cBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(solidColors), gl.STATIC_DRAW);
 
     var colorLoc = gl.getAttribLocation( program, "aColor");
     gl.vertexAttribPointer(colorLoc, 4, gl.FLOAT, false, 0, 0);
@@ -68,19 +70,34 @@ window.onload = function init()
                 nebula = 1;
                 star = 0;
                 planets = 0;
+                solar = 0;
                 break;
             case 1:
                 nebula = 0;
                 star = 1;
                 planets = 0;
+                solar = 0;
                 break;
             case 2:
                 nebula = 0;
                 star = 1;
                 planets = 1;
+                solar = 0;
                 break;
             case 3:
+                nebula = 0;
+                star = 1;
+                planets = 1;
+                solar = 1 - solar;
                 break; 
+        }
+        if (solar == 0) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(solidColors), gl.STATIC_DRAW);
+        }
+        else {
+            gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, flatten(interpColors), gl.STATIC_DRAW);
         }
     };
 
@@ -135,10 +152,8 @@ function quad(a, b, c, d)
 
     for ( var i = 0; i < indices.length; ++i ) {
         positions.push(vertices[indices[i]]);
-        //colors.push( vertexColors[indices[i]] );
-
-        // for solid colored faces use
-        colors.push(vertexColors[a]);
+        interpColors.push( vertexColors[indices[i]] );
+        solidColors.push(vertexColors[a]);
     }
 
 }
@@ -192,7 +207,7 @@ function drawPlanets() {
     var numPlanets = 4;
     var planetScales = [0.6, 0.4, 0.35, 0.5];
     var planetDistances = [1.2, 0.9, 1.5, 1.7];
-    var angularOffsets = [0.0, 90.0, 180.0, 270.0]; // degrees
+    var angularOffsets = [0.0, 90.0, 180.0, 270.0]; 
 
     for (var i = 0; i < numPlanets; i++) {
         var modelViewMatrix = mat4();
