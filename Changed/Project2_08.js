@@ -145,7 +145,7 @@ function quad(a, b, c, d)
         vec4(0.6, 0.0, 0.45, 1.0),  // maroon purple
         vec4(0.9, 0.0, 0.4, 1.0),  // bright pink
         vec4(0.3, 0.4, 0.2, 1.0),  // forest green
-        vec4(0.5, 0.0, 0.5, 1.0),  // Dark magenta
+        vec4(0.3, 0.0, 0.7, 1.0),  // Dark magenta
         vec4(0.0, 0.5, 0.5, 1.0),  // Dark teal
         vec4(1.0, 1.0, 1.0, 1.0)   // white
     ];
