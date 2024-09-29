@@ -105,14 +105,14 @@ function colorCube()
 function quad(a, b, c, d)
 {
     var vertices = [
-        vec4(-0.25, -0.25,  0.25, 1.0),
-        vec4(-0.25,  0.25,  0.25, 1.0),
-        vec4(0.25,  0.25,  0.25, 1.0),
-        vec4(0.25, -0.25,  0.25, 1.0),
-        vec4(-0.25, -0.25, -0.25, 1.0),
-        vec4(-0.25,  0.25, -0.25, 1.0),
-        vec4(0.25,  0.25, -0.25, 1.0),
-        vec4(0.25, -0.25, -0.25, 1.0)
+        vec4(-0.18, -0.18,  0.18, 1.0),
+        vec4(-0.18,  0.18,  0.18, 1.0),
+        vec4(0.18,  0.18,  0.18, 1.0),
+        vec4(0.18, -0.18,  0.18, 1.0),
+        vec4(-0.18, -0.18, -0.18, 1.0),
+        vec4(-0.18,  0.18, -0.18, 1.0),
+        vec4(0.18,  0.18, -0.18, 1.0),
+        vec4(0.18, -0.18, -0.18, 1.0)
     ];
 
     var vertexColors = [
@@ -166,21 +166,7 @@ function render()
     
     // Draw the cube wireframe if nebula is selected
     if (planets == 1) {
-        modelViewMatrix = mat4(); 
-
-        modelViewMatrix = mult(modelViewMatrix, scale(0.6, 0.6, 0.6));
-        
-        var r = rotateY(theta[yAxis])
-        modelViewMatrix = mult(modelViewMatrix, r);
-
-        modelViewMatrix = mult(modelViewMatrix, translate(1.0, 0.0, 0));
-
-        modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis]));
-        modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis]));
-        modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
-
-        gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
-        drawCube();
+        drawPlanets();
     }
 
     requestAnimationFrame( render );
@@ -200,5 +186,34 @@ function drawCube() {
         {
             gl.drawArrays( gl.TRIANGLE_FAN, i, 4);
         }
+    }
+}
+function drawPlanets() {
+    var numPlanets = 4;
+    var planetScales = [0.6, 0.4, 0.35, 0.5];
+    var planetDistances = [1.2, 0.9, 1.5, 1.7];
+    var angularOffsets = [0.0, 90.0, 180.0, 270.0]; // degrees
+
+    for (var i = 0; i < numPlanets; i++) {
+        var modelViewMatrix = mat4();
+
+        // Scale the planet
+        modelViewMatrix = mult(modelViewMatrix, scale(planetScales[i], planetScales[i], planetScales[i]));
+
+        // Apply rotation around the main cube with angular offset
+        var r = rotateY(theta[yAxis] + angularOffsets[i]);
+        modelViewMatrix = mult(modelViewMatrix, r);
+
+        // Translate to position around the main cube
+        modelViewMatrix = mult(modelViewMatrix, translate(planetDistances[i], 0.0, 0.0));
+
+        // Apply additional rotations to the planet itself
+        modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis]));
+        modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis]));
+        modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
+
+        // Send matrix to shader and draw the planet
+        gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
+        drawCube();
     }
 }

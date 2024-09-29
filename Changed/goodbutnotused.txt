@@ -1,0 +1,65 @@
+function drawPlanets() {
+    // First Planet
+    var modelViewMatrix = mat4(); 
+    modelViewMatrix = mult(modelViewMatrix, scale(0.6, 0.6, 0.6));
+    
+    var r = rotateZ(theta[zAxis])
+    modelViewMatrix = mult(modelViewMatrix, r);
+
+    modelViewMatrix = mult(modelViewMatrix, translate(1.2, 0.2, 0));
+
+    modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis]));
+    modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis]));
+    modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
+
+    gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
+    drawCube();
+
+    // Second Planet
+    var modelViewMatrix = mat4(); 
+    modelViewMatrix = mult(modelViewMatrix, scale(0.4, 0.4, 0.4));
+    
+    var r = rotateZ(theta[zAxis])
+    modelViewMatrix = mult(modelViewMatrix, r);
+
+    modelViewMatrix = mult(modelViewMatrix, translate(0.9, 0.7, 0.0));
+
+    modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis]));
+    modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis]));
+    modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
+
+    gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
+    drawCube();
+
+    // Third Planet
+    var modelViewMatrix = mat4(); 
+    modelViewMatrix = mult(modelViewMatrix, scale(0.35, 0.35, 0.35));
+    
+    var r = rotateZ(theta[zAxis])
+    modelViewMatrix = mult(modelViewMatrix, r);
+
+    modelViewMatrix = mult(modelViewMatrix, translate(1.5, 0.8, 0.0));
+
+    modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis]));
+    modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis]));
+    modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis]));
+
+    gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
+    drawCube();
+
+    // Fourth Planet
+    var modelViewMatrix = mat4(); 
+    modelViewMatrix = mult(modelViewMatrix, scale(0.5, 0.5, 0.5));
+    
+    var r = rotateZ(theta[zAxis])
+    modelViewMatrix = mult(modelViewMatrix, r);
+
+    modelViewMatrix = mult(modelViewMatrix, translate(1.7, 0.0, 0.0));
+
+    modelViewMatrix = mult(modelViewMatrix, rotateX(theta[xAxis] - 0.1));
+    modelViewMatrix = mult(modelViewMatrix, rotateY(theta[yAxis] - 0.1));
+    modelViewMatrix = mult(modelViewMatrix, rotateZ(theta[zAxis] - 0.1));
+
+    gl.uniformMatrix4fv(uMatrixLoc, false, flatten(modelViewMatrix));
+    drawCube();
+}
