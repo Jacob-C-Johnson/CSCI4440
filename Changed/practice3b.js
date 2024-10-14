@@ -95,31 +95,31 @@ window.onload = function init() {
 
 
     document.getElementById("xPos").onclick = function(){
-
+        eye[0] += 0.1;
     };
 
     document.getElementById("xNeg").onclick = function(){
-
+        eye[0] -= 0.1;
     };
 
     document.getElementById("yPos").onclick = function(){
-
+        eye[1] += 0.1;
     };
 
     document.getElementById("yNeg").onclick = function(){
-
+        eye[1] -= 0.1;
     };
 
     document.getElementById("zPos").onclick = function(){
-
+        eye[2] += 0.1;
     };
 
     document.getElementById("zNeg").onclick = function(){
-
+        eye[2] -= 0.1;
     };
 
     document.getElementById("lightUp").onclick = function(){
-
+        
     };
 
     document.getElementById("lightDown").onclick = function(){
