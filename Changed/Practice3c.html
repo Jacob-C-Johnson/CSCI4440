@@ -12,31 +12,64 @@
 </div>
 
 <div>
-    Material Ambient:
-    <label for="matRed">Red:</label>
+    <span>Material Ambient:</span>
+    <label for="matARed">Red:</label>
     <input type="range" id="matRed" min="0" max="1" step="0.1" value="1.0"></input>
-    <label for="matGreen">Green:</label>
+    <label for="matAGreen">Green:</label>
     <input type="range" id="matGreen" min="0" max="1" step="0.1" value="1.0"></input>
-    <label for="matBlue">Blue:</label>
+    <label for="matABlue">Blue:</label>
     <input type="range" id="matBlue" min="0" max="1" step="0.1" value="1.0"></input>
 </div>
 
 <div>
-    <label for="lightAmbient">Light Ambient:</label>
-    <input type="range" id="lightAmbient" min="0" max="1" step="0.1" value="0.2"></input>
-    <label for="lightDiffuse">Light Diffuse:</label>
-    <input type="range" id="lightDiffuse" min="0" max="1" step="0.1" value="1"></input>
-    <label for="lightSpecular">Light Specular:</label>
-    <input type="range" id="lightSpecular" min="0" max="1" step="0.1" value="1"></input>
-    <label for="lightRed">Light Red:</label>
+    <span>Material Diffuse:</span>
+    <label for="matDRed">Red:</label>
+    <input type="range" id="matRed" min="0" max="1" step="0.1" value="1.0"></input>
+    <label for="matDGreen">Green:</label>
+    <input type="range" id="matGreen" min="0" max="1" step="0.1" value="1.0"></input>
+    <label for="matDBlue">Blue:</label>
+    <input type="range" id="matBlue" min="0" max="1" step="0.1" value="1.0"></input>
+</div>
+
+<div>
+    <span>Material Specular:</span>
+    <label for="matSRed">Red:</label>
+    <input type="range" id="matRed" min="0" max="1" step="0.1" value="1.0"></input>
+    <label for="matSGreen">Green:</label>
+    <input type="range" id="matGreen" min="0" max="1" step="0.1" value="1.0"></input>
+    <label for="matSBlue">Blue:</label>
+    <input type="range" id="matBlue" min="0" max="1" step="0.1" value="1.0"></input>
+</div>
+
+<div>
+    <span>Light Ambient:</span>
+    <label for="lightARed">Light Red:</label>
     <input type="range" id="lightRed" min="0" max="1" step="0.1" value="1.0"></input>
-    <label for="lightGreen">Light Green:</label>
+    <label for="lightAGreen">Light Green:</label>
     <input type="range" id="lightGreen" min="0" max="1" step="0.1" value="1.0"></input>
-    <label for="lightBlue">Light Blue:</label>
+    <label for="lightABlue">Light Blue:</label>
     <input type="range" id="lightBlue" min="0" max="1" step="0.1" value="1.0"></input>
 </div>
 
+<div>
+    <span>Light Diffuse:</span>
+    <label for="lightDRed">Light Red:</label>
+    <input type="range" id="lightRed" min="0" max="1" step="0.1" value="1.0"></input>
+    <label for="lightDGreen">Light Green:</label>
+    <input type="range" id="lightGreen" min="0" max="1" step="0.1" value="1.0"></input>
+    <label for="lightDBlue">Light Blue:</label>
+    <input type="range" id="lightBlue" min="0" max="1" step="0.1" value="1.0"></input>
+</div>
 
+<div>
+    <span>Light Specular:</span>
+    <label for="lightSRed">Light Red:</label>
+    <input type="range" id="lightRed" min="0" max="1" step="0.1" value="1.0"></input>
+    <label for="lightSGreen">Light Green:</label>
+    <input type="range" id="lightGreen" min="0" max="1" step="0.1" value="1.0"></input>
+    <label for="lightSBlue">Light Blue:</label>
+    <input type="range" id="lightBlue" min="0" max="1" step="0.1" value="1.0"></input>
+</div>
 
 <script id="vertex-shader" type="x-shader/x-vertex">
 #version 300 es
