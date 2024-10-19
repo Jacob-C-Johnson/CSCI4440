@@ -123,6 +123,103 @@ window.onload = function init() {
 
     projectionMatrix = ortho(-1, 1, -1, 1, -100, 100);
 
+
+      document.getElementById("shininess").onchange = function(event) {
+         materialShininess = event.target.value;
+         gl.uniform1f(gl.getUniformLocation(program, "uShininess"), materialShininess);
+      };
+
+      document.getElementById("matARed").onchange = function(event) {
+         materialAmbient[0] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"), mult(lightAmbient, materialAmbient));
+
+      };
+
+      document.getElementById("matAGreen").onchange = function(event) {
+         materialAmbient[1] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"), mult(lightAmbient, materialAmbient));
+      };
+
+      document.getElementById("matABlue").onchange = function(event) {
+         materialAmbient[2] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"), mult(lightAmbient, materialAmbient));
+      };
+
+      document.getElementById("matDRed").onchange = function(event) {
+         materialDiffuse[0] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), mult(lightDiffuse, materialDiffuse));
+      };
+
+      document.getElementById("matDGreen").onchange = function(event) {
+         materialDiffuse[1] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), mult(lightDiffuse, materialDiffuse));
+      };
+
+      document.getElementById("matDBlue").onchange = function(event) {
+         materialDiffuse[2] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), mult(lightDiffuse, materialDiffuse));
+      };
+
+      document.getElementById("matSRed").onchange = function(event) {
+         materialSpecular[0] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), mult(lightSpecular, materialSpecular));
+      };
+
+      document.getElementById("matSGreen").onchange = function(event) {
+         materialSpecular[1] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), mult(lightSpecular, materialSpecular));
+      };
+
+      document.getElementById("matSBlue").onchange = function(event) {
+         materialSpecular[2] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), mult(lightSpecular, materialSpecular));
+      };
+
+      document.getElementById("lightARed").onchange = function(event) {
+         lightAmbient[0] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"), mult(lightAmbient, materialAmbient));
+      };
+
+      document.getElementById("lightAGreen").onchange = function(event) {
+         lightAmbient[1] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"), mult(lightAmbient, materialAmbient));
+      };
+
+      document.getElementById("lightABlue").onchange = function(event) {
+         lightAmbient[2] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"), mult(lightAmbient, materialAmbient));
+      };
+
+      document.getElementById("lightDRed").onchange = function(event) {
+         lightDiffuse[0] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), mult(lightDiffuse, materialDiffuse));
+      };
+
+      document.getElementById("lightDGreen").onchange = function(event) {
+         lightDiffuse[1] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), mult(lightDiffuse, materialDiffuse));
+      };
+
+      document.getElementById("lightDBlue").onchange = function(event) {
+         lightDiffuse[2] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), mult(lightDiffuse, materialDiffuse));
+      };
+
+      document.getElementById("lightSRed").onchange = function(event) {
+         lightSpecular[0] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), mult(lightSpecular, materialSpecular));
+      };
+
+      document.getElementById("lightSGreen").onchange = function(event) {
+         lightSpecular[1] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), mult(lightSpecular, materialSpecular));
+      };
+
+      document.getElementById("lightSBlue").onchange = function(event) {
+         lightSpecular[2] = event.target.value;
+         gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"), mult(lightSpecular, materialSpecular));
+      };
+
     var ambientProduct = mult(lightAmbient, materialAmbient);
     var diffuseProduct = mult(lightDiffuse, materialDiffuse);
     var specularProduct = mult(lightSpecular, materialSpecular);
