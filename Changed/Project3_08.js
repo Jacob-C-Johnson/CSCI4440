@@ -160,7 +160,7 @@ window.onload = function init() {
     document.getElementById("Awakening").onclick = function(event) {
         awake = 1 - awake;
         if(awake){
-            materialDiffuse = vec4(0.1, 0.9, 0.3, 1.0);
+            materialDiffuse = vec4(0.2, 0.9, 0.3, 1.0);
         }
         else{
             materialDiffuse = vec4(0.7, 0.3, 0.9, 1.0);
