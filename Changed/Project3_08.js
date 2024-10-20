@@ -7,10 +7,12 @@ var gl;
 var awake = 0;
 var power = 0;
 var light = 0;
-var animationActive = false;
+var focous = 0;
+var lightAnimationActive = false;
 var movingRight = true;
 var pulseAnimationActive = false; 
 var increasing = true; 
+var growing = false;
 
 var numTimesToSubdivide = 6;
 
@@ -28,7 +30,7 @@ var dr = 5.0 * Math.PI/180.0;
 
 var left = -3.0;
 var right = 3.0;
-var ytop =3.0;
+var ytop = 3.0;
 var bottom = -3.0;
 
 var va = vec4(0.0, 0.0, -1.0,1);
@@ -167,8 +169,6 @@ window.onload = function init() {
         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), flatten(diffuseProduct));
     };
 
-    let pulseIntervalId = null; // Store the interval ID for toggling
-    let increasing = true; // Track if values are increasing or decreasing
     document.getElementById("Power").onclick = function () {
         power = 1 - power; // Toggle power state
         if (power) {
@@ -183,15 +183,15 @@ window.onload = function init() {
         light = 1 - light; // Toggle power state
 
         if (light) {
-            animationActive = true; // Start the animation
+            lightAnimationActive = true; // Start the animation
             animateLight(); // Begin animating the light
         } else {
-            animationActive = false; // Pause the animation
+            lightAnimationActive = false; // Pause the animation
         }
     };
 
     document.getElementById("Focused").onclick = function(event) {
-        
+        focous = 1 - focous;
     };
 
     gl.uniform4fv(gl.getUniformLocation(program,
@@ -236,7 +236,7 @@ window.onload = function init() {
     }
 
     function animateLight() {
-        if (!animationActive) return; // Stop if animation is inactive
+        if (!lightAnimationActive) return; // Stop if animation is inactive
     
         // Move the light along the x-axis
         if (movingRight) {
@@ -268,6 +268,20 @@ function render() {
 
     var ViewMatrix = lookAt(eye, at , up);
     projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+
+    // Eyes Squint functions
+    if(focous){
+        if(growing){
+            ytop -= 0.01;
+            bottom += 0.01;
+        }
+        else{
+            ytop += 0.01;
+            bottom -= 0.01;
+        }
+        if(bottom <= -7) growing = true;
+        if(bottom >= -3) growing = false;
+    }
 
     // First Sphere
     var sphereMatrix = translate(firstSphere[0], firstSphere[1], firstSphere[2]);
