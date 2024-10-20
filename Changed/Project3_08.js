@@ -6,6 +6,11 @@ var gl;
 // project variables
 var awake = 0;
 var power = 0;
+var light = 0;
+var animationActive = false;
+var movingRight = true;
+var pulseAnimationActive = false; 
+var increasing = true; 
 
 var numTimesToSubdivide = 6;
 
@@ -167,14 +172,22 @@ window.onload = function init() {
     document.getElementById("Power").onclick = function () {
         power = 1 - power; // Toggle power state
         if (power) {
-            startPulsing(); // Start pulsing
+            pulseAnimationActive = true; // Start pulsing
+            pulseDiffuse(); // Begin the animation
         } else {
-            stopPulsing(); // Stop pulsing
+            pulseAnimationActive = false; // Pause pulsing
         }
     };
 
     document.getElementById("Seeking").onclick = function(event) {
+        light = 1 - light; // Toggle power state
 
+        if (light) {
+            animationActive = true; // Start the animation
+            animateLight(); // Begin animating the light
+        } else {
+            animationActive = false; // Pause the animation
+        }
     };
 
     document.getElementById("Focused").onclick = function(event) {
@@ -197,38 +210,50 @@ window.onload = function init() {
        "uShininess"),materialShininess);
 
     render();
-
-    function startPulsing() {
-        if (pulseIntervalId) return; // Avoid multiple intervals
-    
-        pulseIntervalId = setInterval(() => {
-            pulseDiffuse(); // Pulse the diffuse values
-        }, 100); // Adjust the interval for smoothness
-    }
-    
-    function stopPulsing() {
-        clearInterval(pulseIntervalId); // Stop the pulsing
-        pulseIntervalId = null; // Reset the interval ID
-    }
     
     function pulseDiffuse() {
+        if (!pulseAnimationActive) return; // Stop if animation is inactive
+
+        // Adjust the material diffuse values
         for (let i = 0; i < 3; i++) {
             if (increasing) {
-                materialDiffuse[i] = Math.min(1.0, materialDiffuse[i] + 0.05); // Increase
+                materialDiffuse[i] = Math.min(1.0, materialDiffuse[i] + 0.01); // Increase
             } else {
-                materialDiffuse[i] = Math.max(0.0, materialDiffuse[i] - 0.05); // Decrease
+                materialDiffuse[i] = Math.max(0.0, materialDiffuse[i] - 0.01); // Decrease
             }
         }
-    
+
         // Reverse direction when reaching limits
         if (materialDiffuse[0] === 1.0) increasing = false;
         if (materialDiffuse[0] === 0.0) increasing = true;
-    
-        console.log(materialDiffuse); // Log the diffuse values
-    
-        // Send updated material to the shader
+
+        // Send the updated values to the shader
         const diffuseProduct = mult(lightDiffuse, materialDiffuse);
         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), flatten(diffuseProduct));
+
+        // Request the next animation frame
+        requestAnimationFrame(pulseDiffuse);
+    }
+
+    function animateLight() {
+        if (!animationActive) return; // Stop if animation is inactive
+    
+        // Move the light along the x-axis
+        if (movingRight) {
+            lightPosition[0] = Math.min(2.0, lightPosition[0] + 0.01); // Move right
+        } else {
+            lightPosition[0] = Math.max(-2.0, lightPosition[0] - 0.01); // Move left
+        }
+    
+        // Reverse direction at the boundaries
+        if (lightPosition[0] === 2.0) movingRight = false;
+        if (lightPosition[0] === -2.0) movingRight = true;
+    
+        // Send the updated light position to the shader
+        gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"), flatten(lightPosition));
+    
+        // Request the next frame
+        requestAnimationFrame(animateLight);
     }
 }
 
@@ -265,8 +290,6 @@ function render() {
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     gl.uniformMatrix3fv(nMatrixLoc, false, flatten(nMatrix) );
-
-
 
     for( var i=0; i<index; i+=3)
         gl.drawArrays( gl.TRIANGLES, i, 3 );
