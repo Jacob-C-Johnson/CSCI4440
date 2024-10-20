@@ -8,6 +8,8 @@ var awake = 0;
 var power = 0;
 var light = 0;
 var focous = 0;
+
+// animation state variables
 var lightAnimationActive = false;
 var movingRight = true;
 var pulseAnimationActive = false; 
@@ -157,25 +159,35 @@ window.onload = function init() {
     projectionMatrixLoc = gl.getUniformLocation(program, "uProjectionMatrix");
     nMatrixLoc = gl.getUniformLocation(program, "uNormalMatrix");
 
+    // Event listener for awakening
     document.getElementById("Awakening").onclick = function(event) {
+        // Toggle the awake state
         awake = 1 - awake;
         if(awake){
+            // Change the material color to a green hue
             materialDiffuse = vec4(0.2, 0.9, 0.3, 1.0);
         }
         else{
+            // Change the material color to a purple hue
             materialDiffuse = vec4(0.7, 0.3, 0.9, 1.0);
         }
+        // Send the product to the fragment shader
         var diffuseProduct = mult(lightDiffuse, materialDiffuse);
         gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"), flatten(diffuseProduct));
     };
 
+    // Event listener for power
     document.getElementById("Power").onclick = function () {
-        power = 1 - power; // Toggle power state
+        // Toggle power state
+        power = 1 - power; 
         if (power) {
-            pulseAnimationActive = true; // Start pulsing
-            pulseDiffuse(); // Begin the animation
+            // Set a flag to begin the animation
+            pulseAnimationActive = true;
+            // Call the animation function
+            pulseDiffuse(); 
         } else {
-            pulseAnimationActive = false; // Pause pulsing
+            // Set the animation flag to stop the animation
+            pulseAnimationActive = false; 
         }
     };
 
@@ -183,14 +195,18 @@ window.onload = function init() {
         light = 1 - light; // Toggle power state
 
         if (light) {
-            lightAnimationActive = true; // Start the animation
-            animateLight(); // Begin animating the light
+            // Set a flag to begin the animation
+            lightAnimationActive = true;
+            // Call the animation function
+            animateLight(); 
         } else {
-            lightAnimationActive = false; // Pause the animation
+            // Set the animation flag to stop the animation
+            lightAnimationActive = false;
         }
     };
 
     document.getElementById("Focused").onclick = function(event) {
+        // Toggle the focus state
         focous = 1 - focous;
     };
 
@@ -271,14 +287,17 @@ function render() {
 
     // Eyes Squint functions
     if(focous){
+        // grow the eyes
         if(growing){
             ytop -= 0.01;
             bottom += 0.01;
         }
+        // shirnk the eyes
         else{
             ytop += 0.01;
             bottom -= 0.01;
         }
+        // checks to reverse the function at max and min values
         if(bottom <= -7) growing = true;
         if(bottom >= -3) growing = false;
     }
