@@ -160,7 +160,7 @@ window.onload = function init() {
     document.getElementById("Awakening").onclick = function(event) {
         awake = 1 - awake;
         if(awake){
-            materialDiffuse = vec4(0.0, 0.9, 0.3, 1.0);
+            materialDiffuse = vec4(0.1, 0.9, 0.3, 1.0);
         }
         else{
             materialDiffuse = vec4(0.7, 0.3, 0.9, 1.0);
@@ -224,8 +224,8 @@ window.onload = function init() {
         }
 
         // Reverse direction when reaching limits
-        if (materialDiffuse[0] === 1.0) increasing = false;
-        if (materialDiffuse[0] === 0.0) increasing = true;
+        if (materialDiffuse[0] === 1.0 || materialDiffuse[1] === 1.0 || materialDiffuse[2] === 1.0) increasing = false;
+        if (materialDiffuse[0] === 0.0 || materialDiffuse[1] === 0.0 || materialDiffuse[2] === 0.0) increasing = true;
 
         // Send the updated values to the shader
         const diffuseProduct = mult(lightDiffuse, materialDiffuse);
