@@ -33,7 +33,7 @@ var scan1 = false;
 var scan2 = false;
 var zoomIn = false;
 var zoomOut = false;
-var zoomToggle = false;
+var scanToggle = 1;
 
 var m;
 
@@ -271,44 +271,18 @@ var render = function() {
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         if(scan1) {
-            if (moveR)
-            {
-                eye[0] += 0.2;
-                if (eye[0] > 2.0)
-                {
-                    moveR = false;
-                    moveL = true;
-                }
-            }
-            else if (moveL)
-            {
-                eye[0] -= 0.2;
-                if (eye[0] < -2.0)
-                {
-                    moveR = true;
-                    moveL = false;
-                }
+            eye[0] += 0.2 * scanToggle;
+
+            if (eye[0] > 2.0 || eye[0] < -2.0) {
+                scanToggle *= -1;
             }
         }
 
         if(scan2) { 
-            if (moveU)
-            {
-                eye[1] += 0.2;
-                if (eye[1] > 2.0)
-                {
-                    moveU = false;
-                    moveD = true;
-                }
-            }
-            else if (moveD)
-            {
-                eye[1] -= 0.2;
-                if (eye[1] < -2.0)
-                {
-                    moveU = true;
-                    moveD = false;
-                }
+            eye[1] += 0.2 * scanToggle;
+
+            if (eye[1] > 2.0 || eye[1] < -2.0) {
+                scanToggle *= -1;
             }
         }
 
