@@ -136,7 +136,8 @@ window.onload = function init() {
     document.getElementById("Controls1" ).onclick = function(event) {
         switch( event.target.index ) {
 			case 0: {
-
+                leftColor = vec4(0.5, 0.5, 0.5, 1.0);
+                gl.uniform4fv(gl.getUniformLocation(program,"DiffuseProduct"), mult(lightDiffuse, leftColor));
 				break;
 			}
 			case 1: {

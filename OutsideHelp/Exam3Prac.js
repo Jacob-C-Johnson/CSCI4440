@@ -252,8 +252,6 @@ window.onload = function init() {
         }
     };
 
-    // implement the scan menu
-
     projectionMatrix = ortho(left, right, bottom, top, near, far);
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 
