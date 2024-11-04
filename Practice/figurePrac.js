@@ -11,6 +11,8 @@ var instanceMatrix;
 
 var modelViewMatrixLoc;
 
+var spin = false;
+
 var vertices = [
 
     vec4( -0.5, -0.5,  0.5, 1.0 ),
@@ -380,6 +382,10 @@ window.onload = function init() {
         for(i=0; i<numNodes; i++) initNodes(i);
     };
 
+    document.getElementById("spin").onclick = function() {
+        spin = !spin;
+    };
+
 
 
     for(i=0; i<numNodes; i++) initNodes(i);
@@ -391,6 +397,10 @@ window.onload = function init() {
 var render = function() {
 
         gl.clear( gl.COLOR_BUFFER_BIT );
+        if(spin) { 
+            theta[torsoId ] = (theta[torsoId ] + 2) % 360;
+            initNodes(torsoId);
+        }
         traverse(torsoId);
         requestAnimationFrame(render);
 }
