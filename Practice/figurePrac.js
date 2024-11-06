@@ -386,6 +386,10 @@ window.onload = function init() {
         spin = !spin;
     };
 
+    document.getElementById("color").onclick = function() {
+        
+    };
+
 
 
     for(i=0; i<numNodes; i++) initNodes(i);
