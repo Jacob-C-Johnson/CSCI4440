@@ -11,14 +11,18 @@ var instanceMatrix;
 
 var modelViewMatrixLoc;
 
-// bollean for tricks
-var spin = false;
+// Trick 1 varibles
+var trick1 = false;
 var swinging = true;
-
-var spin2 = false;
+// Trick 2 varibles
+var trick2 = false;
+var nodding = true;
+var kicking = true;
 
 // Changes to vec3 to adjust axis for different body parts
 var arms2 = vec3(1, 0, 0);
+var head2 = vec3(1, 0, 0);
+var legAxis = vec3(1, 0, 0);
 
 var vertices = [
 
@@ -91,7 +95,7 @@ var figure = [];
 
 // All things color related
 var normalsArray = [];
-var lightPosition = vec4(5.0, 5.0, 5.0, 0.0);
+var lightPosition = vec4(10.0, 5.0, 10.0, 0.0);
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
 var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
 var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
@@ -181,14 +185,14 @@ function initNodes(Id) {
     case leftUpperLegId:
 
     m = translate(-(torsoWidth+upperLegWidth), 0.1*upperLegHeight, 0.0);
-	  m = mult(m , rotate(theta[leftUpperLegId], vec3(1, 0, 0)));
+	  m = mult(m , rotate(theta[leftUpperLegId], legAxis));
     figure[leftUpperLegId] = createNode( m, leftUpperLeg, rightUpperLegId, leftLowerLegId );
     break;
 
     case rightUpperLegId:
 
     m = translate(torsoWidth+upperLegWidth, 0.1*upperLegHeight, 0.0);
-	  m = mult(m, rotate(theta[rightUpperLegId], vec3(1, 0, 0)));
+	  m = mult(m, rotate(theta[rightUpperLegId], legAxis));
     figure[rightUpperLegId] = createNode( m, rightUpperLeg, null, rightLowerLegId );
     break;
 
@@ -232,7 +236,7 @@ function initNodes(Id) {
     case head1Id2:
     case head2Id2:
     m = translate(0.0, torsoHeight+0.5*headHeight, 0.0);
-    m = mult(m, rotate(theta[head1Id2], vec3(1, 0, 0)))
+    m = mult(m, rotate(theta[head1Id2], head2))
     m = mult(m, rotate(theta[head2Id2], vec3(0, 1, 0)));
     m = mult(m, translate(0.0, -0.5*headHeight, 0.0));
     figure[headId2] = createNode( m, head, leftUpperArmId2, null);
@@ -532,19 +536,21 @@ window.onload = function init() {
 
 
     document.getElementById("reset").onclick = function() { 
-        theta = [
-            0, 0, 0, 0, 0, 0, 180, 0, 180, 0, 0,
-            0, 0, 0, 0, 0, 0, 180, 0, 180, 0, 0
-        ];
-        for(i=0; i<numNodes; i++) initNodes(i);
+        resetFigures();
+        trick1 = false;
+        trick2 = false;
     };
 
-    document.getElementById("spin").onclick = function() {
-        spin = !spin;
+    document.getElementById("trick1").onclick = function() {
+        trick1 = !trick1;
+        trick2 = false;
+        resetFigures();
     };
 
-    document.getElementById("color").onclick = function() {
-        spin2 = !spin2;
+    document.getElementById("trick2").onclick = function() {
+        trick2 = !trick2;
+        trick1 = false;
+        resetFigures();
     };
 
     for(i=0; i<numNodes; i++) initNodes(i);
@@ -556,25 +562,12 @@ window.onload = function init() {
 var render = function() {
 
         gl.clear( gl.COLOR_BUFFER_BIT );
-        if(spin) { 
-            // spin the first figure
+        if(trick1) { 
+            // Spin the first figure
             theta[torsoId] = (theta[torsoId ] + 2) % 360;
             initNodes(torsoId);
-            // change arms axis
 
-            // arms2 = vec3(0, 0, 1);
-            // theta[leftUpperArmId2] = (theta[leftUpperArmId2] + 2) % -90;
-            // initNodes(leftUpperArmId2);
-            // theta[rightUpperArmId2] = (theta[rightUpperArmId2] + 2) % -90;
-            // initNodes(rightUpperArmId2);
-            // arms2 = vec3(0, 1, 0);
-            // theta[leftLowerArmId2] = (theta[leftLowerArmId2] + 2) % 180;
-            // initNodes(leftLowerArmId2);
-            // theta[rightLowerArmId2] = (theta[rightLowerArmId2] + 2) % 180;
-            // initNodes(rightLowerArmId2);
-            // figure 2 does the wave
-
-            // Toggle for arm wave direction
+            // Spin the second figures arms in a wave motion
             if  (swinging) {
                 arms2 = vec3(0, 1, 0);
                 theta[leftUpperArmId2] += 2; // Move left upper arm up
@@ -597,7 +590,7 @@ var render = function() {
             initNodes(leftLowerArmId2);
             initNodes(rightLowerArmId2);
 
-            // Define limits and reverse direction if reached
+            // If limits are met then switch directions
             if (theta[leftUpperArmId2] <= -90 || theta[leftUpperArmId2] >= 0) swinging = !swinging;
             if (theta[leftLowerArmId2] >= 180 || theta[leftLowerArmId2] <= 0) swinging = !swinging;
 
@@ -609,9 +602,33 @@ var render = function() {
         traverse(torsoId); // Render the first figure
 
 
-        if(spin2) {
-            theta[torsoId2] = (theta[torsoId2] + 2) % 360;
-            initNodes(torsoId2);
+        if(trick2) {
+            // Kick first figures legs side to side
+            legAxis = vec3(0, 0, 1);
+            if (kicking) {
+                theta[leftUpperLegId] -= 2;
+                theta[rightUpperLegId] -= 2;
+            }
+            else {
+                theta[leftUpperLegId] += 2;
+                theta[rightUpperLegId] += 2;
+            }
+            initNodes(leftUpperLegId);
+            initNodes(rightUpperLegId);
+            if (theta[rightUpperLegId] <= 140) kicking = !kicking;
+            if (theta[rightUpperLegId] >= 220) kicking = !kicking;
+            
+
+            // Nod second figure's head back and fourth
+            head2 = vec3(0, 0, 1);
+            if (nodding){
+                theta[head1Id2] += 2;
+            }
+            else {
+                theta[head1Id2] -= 2;
+            }
+            initNodes(head1Id2);
+            if (theta[head1Id2] <= -65 || theta[head1Id2] >= 65) nodding = !nodding;
         }
 
         materialDiffuse = vec4(0.2, 0.2, 0.7, 1.0); // Blue color for the second figure
@@ -620,4 +637,19 @@ var render = function() {
         traverse(torsoId2); // Render the second figure
 
         requestAnimationFrame(render);
+}
+
+function resetFigures() {
+    // Reset trick one values
+    arms2 = vec3(1, 0, 0);
+    // reset trick two values
+    head2 = vec3(1, 0, 0);
+    legAxis = vec3(1, 0, 0);
+
+    // reset figure angles and reinitialize nodes
+    theta = [
+        0, 0, -180, 0, -180, 0, 180, 0, 180, 0, 0,
+        0, 0, -180, 0, -180, 0, 180, 0, 180, 0, 0
+    ];
+    for(i=0; i<numNodes; i++) initNodes(i);
 }
