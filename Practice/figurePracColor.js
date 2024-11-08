@@ -11,8 +11,14 @@ var instanceMatrix;
 
 var modelViewMatrixLoc;
 
+// bollean for tricks
 var spin = false;
+var swinging = true;
+
 var spin2 = false;
+
+// Changes to vec3 to adjust axis for different body parts
+var arms2 = vec3(1, 0, 0);
 
 var vertices = [
 
@@ -234,37 +240,37 @@ function initNodes(Id) {
 
     case leftUpperArmId2:
     m = translate(-(torsoWidth+upperArmWidth), 0.9*torsoHeight, 0.0);
-    m = mult(m, rotate(theta[leftUpperArmId2], vec3(1, 0, 0)));
+    m = mult(m, rotate(theta[leftUpperArmId2], arms2));
     figure[leftUpperArmId2] = createNode( m, leftUpperArm, rightUpperArmId2, leftLowerArmId2 );
     break;
 
     case rightUpperArmId2:
     m = translate(torsoWidth+upperArmWidth, 0.9*torsoHeight, 0.0);
-    m = mult(m, rotate(theta[rightUpperArmId2], vec3(1, 0, 0)));
+    m = mult(m, rotate(theta[rightUpperArmId2], arms2));
     figure[rightUpperArmId2] = createNode( m, rightUpperArm, leftUpperLegId2, rightLowerArmId2 );
     break;
 
     case leftUpperLegId2:
     m = translate(-(torsoWidth+upperLegWidth), 0.1*upperLegHeight, 0.0);
-    m = mult(m , rotate(theta[leftUpperLegId2], vec3(1, 0, 0)));
+    m = mult(m , rotate(theta[leftUpperLegId2], arms2));
     figure[leftUpperLegId2] = createNode( m, leftUpperLeg, rightUpperLegId2, leftLowerLegId2 );
     break;
 
     case rightUpperLegId2:
     m = translate(torsoWidth+upperLegWidth, 0.1*upperLegHeight, 0.0);
-    m = mult(m, rotate(theta[rightUpperLegId2], vec3(1, 0, 0)));
+    m = mult(m, rotate(theta[rightUpperLegId2], arms2));
     figure[rightUpperLegId2] = createNode( m, rightUpperLeg, null, rightLowerLegId2 );
     break;
 
     case leftLowerArmId2:
     m = translate(0.0, upperArmHeight, 0.0);
-    m = mult(m, rotate(theta[leftLowerArmId2], vec3(1, 0, 0)));
+    m = mult(m, rotate(theta[leftLowerArmId2], arms2));
     figure[leftLowerArmId2] = createNode( m, leftLowerArm, null, null );
     break;
 
     case rightLowerArmId2:
     m = translate(0.0, upperArmHeight, 0.0);
-    m = mult(m, rotate(theta[rightLowerArmId2], vec3(1, 0, 0)));
+    m = mult(m, rotate(theta[rightLowerArmId2], arms2));
     figure[rightLowerArmId2] = createNode( m, rightLowerArm, null, null );
     break;
 
@@ -551,9 +557,52 @@ var render = function() {
 
         gl.clear( gl.COLOR_BUFFER_BIT );
         if(spin) { 
+            // spin the first figure
             theta[torsoId] = (theta[torsoId ] + 2) % 360;
             initNodes(torsoId);
+            // change arms axis
+
+            // arms2 = vec3(0, 0, 1);
+            // theta[leftUpperArmId2] = (theta[leftUpperArmId2] + 2) % -90;
+            // initNodes(leftUpperArmId2);
+            // theta[rightUpperArmId2] = (theta[rightUpperArmId2] + 2) % -90;
+            // initNodes(rightUpperArmId2);
+            // arms2 = vec3(0, 1, 0);
+            // theta[leftLowerArmId2] = (theta[leftLowerArmId2] + 2) % 180;
+            // initNodes(leftLowerArmId2);
+            // theta[rightLowerArmId2] = (theta[rightLowerArmId2] + 2) % 180;
+            // initNodes(rightLowerArmId2);
+            // figure 2 does the wave
+
+            // Toggle for arm wave direction
+            if  (swinging) {
+                arms2 = vec3(0, 1, 0);
+                theta[leftUpperArmId2] += 2; // Move left upper arm up
+                theta[rightUpperArmId2] += 2; // Move right upper arm up
+                arms2 = vec3(0, 1, 0);
+                theta[leftLowerArmId2] += 2; // Move left lower arm down
+                theta[rightLowerArmId2] += 2; // Move right lower arm down
+            } else {
+                arms2 = vec3(0, 1, 0);
+                theta[leftUpperArmId2] -= 2; // Move left upper arm down
+                theta[rightUpperArmId2] -= 2; // Move right upper arm down
+                arms2 = vec3(0, 0, 1);
+                theta[leftLowerArmId2] -= 2; // Move left lower arm up
+                theta[rightLowerArmId2] -= 2; // Move right lower arm up
+            }
+
+            // Initialize each node after updating theta
+            initNodes(leftUpperArmId2);
+            initNodes(rightUpperArmId2);
+            initNodes(leftLowerArmId2);
+            initNodes(rightLowerArmId2);
+
+            // Define limits and reverse direction if reached
+            if (theta[leftUpperArmId2] <= -90 || theta[leftUpperArmId2] >= 0) swinging = !swinging;
+            if (theta[leftLowerArmId2] >= 180 || theta[leftLowerArmId2] <= 0) swinging = !swinging;
+
         }
+
         materialDiffuse = vec4(1.0, 0.2, 0.8, 1.0); // Purple color for the first figure
         diffuseProduct = mult(lightDiffuse, materialDiffuse);
         gl.uniform4fv(diffuseProductLoc, flatten(diffuseProduct));
