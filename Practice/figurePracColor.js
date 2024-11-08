@@ -588,9 +588,10 @@ var render = function() {
                 arms2 = vec3(0, 1, 0);
                 theta[leftUpperArmId2] += 2; // Move left upper arm up
                 theta[rightUpperArmId2] += 2; // Move right upper arm up
-                arms2 = vec3(0, 1, 0);
+                arms2 = vec3(0, 0, 1);
                 theta[leftLowerArmId2] += 2; // Move left lower arm down
                 theta[rightLowerArmId2] += 2; // Move right lower arm down
+                console.log("swinging");
             } else {
                 arms2 = vec3(0, 1, 0);
                 theta[leftUpperArmId2] -= 2; // Move left upper arm down
@@ -598,6 +599,7 @@ var render = function() {
                 arms2 = vec3(0, 0, 1);
                 theta[leftLowerArmId2] -= 2; // Move left lower arm up
                 theta[rightLowerArmId2] -= 2; // Move right lower arm up
+                console.log("not swinging");
             }
 
             // Initialize each node after updating theta
@@ -607,8 +609,8 @@ var render = function() {
             initNodes(rightLowerArmId2);
 
             // If limits are met then switch directions
-            if (theta[leftUpperArmId2] <= -90 || theta[leftUpperArmId2] >= 0) swinging = !swinging;
-            if (theta[leftLowerArmId2] >= 180 || theta[leftLowerArmId2] <= 0) swinging = !swinging;
+            if (theta[leftUpperArmId2] <= -90 || theta[leftUpperArmId2] >= 90) swinging = !swinging;
+            if (theta[leftLowerArmId2] >= 270 || theta[leftLowerArmId2] <= 90) swinging = !swinging;
 
         }
 
@@ -642,25 +644,50 @@ var render = function() {
         }
 
         if (trick3) {
-            // Figure 1 jumps up and down
+            // Target angles for bending and straightening the legs
+            const bendUpperLegAngle = 0;
+            const bendLowerLegAngle = 0;
+            const straightLegAngle = 180;
+
+            // Increment to control bending speed
+            const bendSpeed = 1; // Adjust this for faster or slower bending
+
             // Jumping motion
             if (jumping) {
                 jumpHeight += 0.05;
-                // Bend legs as character reaches the peak
-                if (jumpHeight >= 1.5) { // Start bending near the peak
-                    theta[leftUpperLegId] = 180; 
-                    theta[rightUpperLegId] = 180;
-                    theta[leftLowerLegId] = 0;  
-                    theta[rightLowerLegId] = 0;
+                
+                // Gradually bend legs as character approaches the peak of the jump
+                if (jumpHeight >= 1.5) {
+                    if (theta[leftUpperLegId] > bendUpperLegAngle) {
+                        theta[leftUpperLegId] -= bendSpeed; // Bend upper leg
+                    }
+                    if (theta[rightUpperLegId] > bendUpperLegAngle) {
+                        theta[rightUpperLegId] -= bendSpeed;
+                    }
+                    if (theta[leftLowerLegId] < bendLowerLegAngle) {
+                        theta[leftLowerLegId] += bendSpeed; // Bend lower leg
+                    }
+                    if (theta[rightLowerLegId] < bendLowerLegAngle) {
+                        theta[rightLowerLegId] += bendSpeed;
+                    }
                 }
             } else {
                 jumpHeight -= 0.05;
-                // Straighten legs when near ground level
-                if (jumpHeight <= 0.5) { // Start straightening as character lands
-                    theta[leftUpperLegId] = 0;
-                    theta[rightUpperLegId] = 0;
-                    theta[leftLowerLegId] = 0;
-                    theta[rightLowerLegId] = 0;
+                
+                // Gradually straighten legs as character returns to the ground
+                if (jumpHeight <= 0.5) {
+                    if (theta[leftUpperLegId] < straightLegAngle) {
+                        theta[leftUpperLegId] += bendSpeed; // Straighten upper leg
+                    }
+                    if (theta[rightUpperLegId] < straightLegAngle) {
+                        theta[rightUpperLegId] += bendSpeed;
+                    }
+                    if (theta[leftLowerLegId] > straightLegAngle) {
+                        theta[leftLowerLegId] -= bendSpeed; // Straighten lower leg
+                    }
+                    if (theta[rightLowerLegId] > straightLegAngle) {
+                        theta[rightLowerLegId] -= bendSpeed;
+                    }
                 }
             }
 
@@ -675,6 +702,7 @@ var render = function() {
             if (jumpHeight >= 2.0) jumping = false; // Max jump height
             if (jumpHeight <= 0.0) jumping = true;  // Return to ground level
 
+
             // Figure 2 twists its torso
             if (twisting) {
                 theta[torsoId2] += 1; // Adjust this for the speed of rotation
@@ -682,8 +710,8 @@ var render = function() {
                 theta[torsoId2] -= 1;
             }
             initNodes(torsoId2);
-            if (theta[torsoId2] >= 30) twisting = false; // Max twist angle to the right
-            if (theta[torsoId2] <= -30) twisting = true; // Max twist angle to the left
+            if (theta[torsoId2] >= 215) twisting = false; // Max twist angle to the right
+            if (theta[torsoId2] <= 145) twisting = true; // Max twist angle to the left
         }
 
         materialDiffuse = vec4(1.0, 0.2, 0.8, 1.0); // Purple color for the first figure
