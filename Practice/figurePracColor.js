@@ -12,6 +12,7 @@ var instanceMatrix;
 var modelViewMatrixLoc;
 
 var spin = false;
+var spin2 = false;
 
 var vertices = [
 
@@ -55,7 +56,7 @@ var rightLowerLegId2 = 20;
 
 var torsoHeight = 5.0;
 var torsoWidth = 1.0;
-var upperArmHeight = 3.0;
+var upperArmHeight = 2.0;
 var lowerArmHeight = 2.0;
 var upperArmWidth  = 0.5;
 var lowerArmWidth  = 0.5;
@@ -64,7 +65,7 @@ var lowerLegWidth  = 0.5;
 var lowerLegHeight = 2.0;
 var upperLegHeight = 3.0;
 var headHeight = 1.5;
-var headWidth = 1.0;
+var headWidth = 1.2;
 
 // number of nodes and angles for figure 1 and 2
 var numNodes = 22;
@@ -73,11 +74,9 @@ var angle = 0;
 
 // Adjusted theta values for figure 1 and 2
 var theta = [
-    0, 0, 0, 0, 0, 0, 180, 0, 180, 0, 0,
-    0, 0, 0, 0, 0, 0, 180, 0, 180, 0, 0
+    0, 0, -180, 0, -180, 0, 180, 0, 180, 0, 0,
+    0, 0, -180, 0, -180, 0, 180, 0, 180, 0, 0
 ];
-
-var numVertices = 24;
 
 var stack = [];
 
@@ -86,7 +85,7 @@ var figure = [];
 
 // All things color related
 var normalsArray = [];
-var lightPosition = vec4(0.0, 10.0, 20.0, 0.0);
+var lightPosition = vec4(5.0, 5.0, 5.0, 0.0);
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
 var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
 var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
@@ -96,8 +95,8 @@ var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
 var materialSpecular = vec4(1.0, 0.8, 0.0, 1.0);
 var materialShininess = 100.0;
 
-var ctm;
-var ambientColor, diffuseColor, specularColor;
+var ambientProduct, diffuseProduct, specularProduct;
+var lightPositionLoc, diffuseProductLoc, ambientProductLoc, specularProductLoc, shininessLoc;
 
 for( var i=0; i<numNodes; i++) figure[i] = createNode(null, null, null, null);
 
@@ -137,9 +136,12 @@ function initNodes(Id) {
     switch(Id) {
 
     case torsoId:
-
-    m = translate(-5.0, 0.0, 0.0); // Move figure 2 to the right
+    
+    
+    m = mult(m,translate(-5.0, 0.0, 0.0)); // Move figure 1 to the left
     m = mult(m, rotate(theta[torsoId], vec3(0, 1, 0)));
+    m = mult(m,scale(0.5, 1.1, 0.5)); // Thin and tall scaling
+
     figure[torsoId] = createNode(m, torso, null, headId);
     break;
  
@@ -214,8 +216,9 @@ function initNodes(Id) {
     
     // Figure 2 case statements
     case torsoId2:
-    m = translate(5.0, 0.0, 0.0); // Move figure 2 to the right
+    m = mult(m,translate(5.0, 0.0, 0.0)); // Move figure 2 to the right
     m = mult(m, rotate(theta[torsoId2], vec3(0, 1, 0)));
+    m = mult(m,scale(1.2, 0.8, 1.2)); // Wide and short scaling
     figure[torsoId2] = createNode(m, torso, null, headId2);        
     break;
 
@@ -411,7 +414,7 @@ window.onload = function init() {
     if (!gl) { alert( "WebGL 2.0 isn't available" ); }
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    gl.clearColor( 0.5, 0.5, 0.5, 0.5 );
 
     //
     //  Load shaders and initialize attribute buffers
@@ -456,18 +459,20 @@ window.onload = function init() {
     var diffuseProduct = mult(lightDiffuse, materialDiffuse);
     var specularProduct = mult(lightSpecular, materialSpecular);
 
-    // From shaded cube send to vertex shader
-    gl.uniform4fv(gl.getUniformLocation(program, "uAmbientProduct"),
-       ambientProduct);
-    gl.uniform4fv(gl.getUniformLocation(program, "uDiffuseProduct"),
-       diffuseProduct );
-    gl.uniform4fv(gl.getUniformLocation(program, "uSpecularProduct"),
-       specularProduct );
-    gl.uniform4fv(gl.getUniformLocation(program, "uLightPosition"),
-       lightPosition );
+    // Location varibles
+    ambientProductLoc = gl.getUniformLocation(program, "uAmbientProduct");
+    diffuseProductLoc = gl.getUniformLocation(program, "uDiffuseProduct");
+    specularProductLoc = gl.getUniformLocation(program, "uSpecularProduct");
+    lightPositionLoc = gl.getUniformLocation(program, "uLightPosition");
+    shininessLoc = gl.getUniformLocation(program, "uShininess");
 
-    gl.uniform1f(gl.getUniformLocation(program,
-       "uShininess"), materialShininess);
+
+    // From shaded cube send to vertex shader
+    gl.uniform4fv(ambientProductLoc, flatten(ambientProduct));
+    gl.uniform4fv(diffuseProductLoc, flatten(diffuseProduct));
+    gl.uniform4fv(specularProductLoc, flatten(specularProduct));
+    gl.uniform4fv(lightPositionLoc, flatten(lightPosition));
+    gl.uniform1f(shininessLoc, materialShininess);
 
     gl.uniformMatrix4fv( gl.getUniformLocation(program, "uProjectionMatrix"),
        false, flatten(projectionMatrix));
@@ -533,7 +538,7 @@ window.onload = function init() {
     };
 
     document.getElementById("color").onclick = function() {
-        
+        spin2 = !spin2;
     };
 
     for(i=0; i<numNodes; i++) initNodes(i);
@@ -549,8 +554,21 @@ var render = function() {
             theta[torsoId] = (theta[torsoId ] + 2) % 360;
             initNodes(torsoId);
         }
-        traverse(torsoId);
+        materialDiffuse = vec4(1.0, 0.2, 0.8, 1.0); // Purple color for the first figure
+        diffuseProduct = mult(lightDiffuse, materialDiffuse);
+        gl.uniform4fv(diffuseProductLoc, flatten(diffuseProduct));
+        traverse(torsoId); // Render the first figure
 
-        traverse(torsoId2);
+
+        if(spin2) {
+            theta[torsoId2] = (theta[torsoId2] + 2) % 360;
+            initNodes(torsoId2);
+        }
+
+        materialDiffuse = vec4(0.2, 0.2, 0.7, 1.0); // Blue color for the second figure
+        diffuseProduct = mult(lightDiffuse, materialDiffuse);
+        gl.uniform4fv(diffuseProductLoc, flatten(diffuseProduct));
+        traverse(torsoId2); // Render the second figure
+
         requestAnimationFrame(render);
 }

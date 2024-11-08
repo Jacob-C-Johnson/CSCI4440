@@ -17,14 +17,14 @@ out vec4 vColor;
 
 void main()
 {
-    gl_Position = projectionMatrix * modelViewMatrix * aPosition;
-
+    
     vec3 pos = -(modelViewMatrix * aPosition).xyz;
 
     //fixed light postion
 
     vec3 light = uLightPosition.xyz;
     vec3 L = normalize(light - pos);
+
 
     vec3 E = normalize(-pos);
     vec3 H = normalize(L + E);
@@ -48,6 +48,7 @@ void main()
 	  specular = vec4(0.0, 0.0, 0.0, 1.0);
     }
 
+    gl_Position = projectionMatrix * modelViewMatrix *aPosition;
     vColor = ambient + diffuse +specular;
 
     vColor.a = 1.0;
