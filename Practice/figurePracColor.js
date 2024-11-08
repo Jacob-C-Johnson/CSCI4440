@@ -219,14 +219,14 @@ function initNodes(Id) {
     case leftLowerLegId:
 
     m = translate(0.0, upperLegHeight, 0.0);
-    m = mult(m, rotate(theta[leftLowerLegId],vec3(1, 0, 0)));
+    m = mult(m, rotate(theta[leftLowerLegId],vec3(0, 0, 1))); // Changed to Z axis for trick 3
     figure[leftLowerLegId] = createNode( m, leftLowerLeg, null, null );
     break;
 
     case rightLowerLegId:
 
     m = translate(0.0, upperLegHeight, 0.0);
-    m = mult(m, rotate(theta[rightLowerLegId], vec3(1, 0, 0)));
+    m = mult(m, rotate(theta[rightLowerLegId], vec3(0, 0, 1))); // Changed to Z axis for trick 3
     figure[rightLowerLegId] = createNode( m, rightLowerLeg, null, null );
     break;
     
@@ -646,11 +646,11 @@ var render = function() {
         if (trick3) {
             // Target angles for bending and straightening the legs
             const bendUpperLegAngle = 0;
-            const bendLowerLegAngle = 0;
+            const bendLowerLegAngle = -25;
             const straightLegAngle = 180;
 
             // Increment to control bending speed
-            const bendSpeed = 1; // Adjust this for faster or slower bending
+            const bendSpeed = 0.5; // Adjust this for faster or slower bending
 
             // Jumping motion
             if (jumping) {
@@ -664,11 +664,11 @@ var render = function() {
                     if (theta[rightUpperLegId] > bendUpperLegAngle) {
                         theta[rightUpperLegId] -= bendSpeed;
                     }
-                    if (theta[leftLowerLegId] < bendLowerLegAngle) {
-                        theta[leftLowerLegId] += bendSpeed; // Bend lower leg
+                    if (theta[leftLowerLegId] > bendLowerLegAngle) {
+                        theta[leftLowerLegId] -= bendSpeed; // Bend lower leg
                     }
-                    if (theta[rightLowerLegId] < bendLowerLegAngle) {
-                        theta[rightLowerLegId] += bendSpeed;
+                    if (theta[rightLowerLegId] > bendLowerLegAngle) {
+                        theta[rightLowerLegId] -= bendSpeed;
                     }
                 }
             } else {
@@ -683,10 +683,10 @@ var render = function() {
                         theta[rightUpperLegId] += bendSpeed;
                     }
                     if (theta[leftLowerLegId] > straightLegAngle) {
-                        theta[leftLowerLegId] -= bendSpeed; // Straighten lower leg
+                        theta[leftLowerLegId] += bendSpeed; // Straighten lower leg
                     }
                     if (theta[rightLowerLegId] > straightLegAngle) {
-                        theta[rightLowerLegId] -= bendSpeed;
+                        theta[rightLowerLegId] += bendSpeed;
                     }
                 }
             }
