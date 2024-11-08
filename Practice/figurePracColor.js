@@ -18,11 +18,17 @@ var swinging = true;
 var trick2 = false;
 var nodding = true;
 var kicking = true;
+// Trick 3 varibles
+var trick3 = false;
+var twisting = true;
+var jumpHeight = 0;
+var jumping = true;
 
 // Changes to vec3 to adjust axis for different body parts
-var arms2 = vec3(1, 0, 0);
+var arms2 = vec3(0, 0, 1);
 var head2 = vec3(1, 0, 0);
-var legAxis = vec3(1, 0, 0);
+var legAxis = vec3(0, 0, 1);
+var armAxis = vec3(0, 0, 1);
 
 var vertices = [
 
@@ -84,8 +90,8 @@ var angle = 0;
 
 // Adjusted theta values for figure 1 and 2
 var theta = [
-    0, 0, -180, 0, -180, 0, 180, 0, 180, 0, 0,
-    0, 0, -180, 0, -180, 0, 180, 0, 180, 0, 0
+    180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0,
+    180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0
 ];
 
 var stack = [];
@@ -148,7 +154,7 @@ function initNodes(Id) {
     case torsoId:
     
     
-    m = mult(m,translate(-5.0, 0.0, 0.0)); // Move figure 1 to the left
+    m = mult(m,translate(-5.0, jumpHeight, 0.0)); // Move figure 1 to the left
     m = mult(m, rotate(theta[torsoId], vec3(0, 1, 0)));
     m = mult(m,scale(0.5, 1.1, 0.5)); // Thin and tall scaling
 
@@ -171,14 +177,14 @@ function initNodes(Id) {
     case leftUpperArmId:
 
     m = translate(-(torsoWidth+upperArmWidth), 0.9*torsoHeight, 0.0);
-	  m = mult(m, rotate(theta[leftUpperArmId], vec3(1, 0, 0)));
+	  m = mult(m, rotate(theta[leftUpperArmId], armAxis));
     figure[leftUpperArmId] = createNode( m, leftUpperArm, rightUpperArmId, leftLowerArmId );
     break;
 
     case rightUpperArmId:
 
     m = translate(torsoWidth+upperArmWidth, 0.9*torsoHeight, 0.0);
-	  m = mult(m, rotate(theta[rightUpperArmId], vec3(1, 0, 0)));
+	  m = mult(m, rotate(theta[rightUpperArmId], armAxis));
     figure[rightUpperArmId] = createNode( m, rightUpperArm, leftUpperLegId, rightLowerArmId );
     break;
 
@@ -539,17 +545,27 @@ window.onload = function init() {
         resetFigures();
         trick1 = false;
         trick2 = false;
+        trick3 = false;
     };
 
     document.getElementById("trick1").onclick = function() {
         trick1 = !trick1;
         trick2 = false;
+        trick3 = false;
         resetFigures();
     };
 
     document.getElementById("trick2").onclick = function() {
-        trick2 = !trick2;
         trick1 = false;
+        trick2 = !trick2;
+        trick3 = false;
+        resetFigures();
+    };
+
+    document.getElementById("trick3").onclick = function() {
+        trick1 = false;
+        trick2 = false;
+        trick3 = !trick3;
         resetFigures();
     };
 
@@ -596,12 +612,6 @@ var render = function() {
 
         }
 
-        materialDiffuse = vec4(1.0, 0.2, 0.8, 1.0); // Purple color for the first figure
-        diffuseProduct = mult(lightDiffuse, materialDiffuse);
-        gl.uniform4fv(diffuseProductLoc, flatten(diffuseProduct));
-        traverse(torsoId); // Render the first figure
-
-
         if(trick2) {
             // Kick first figures legs side to side
             legAxis = vec3(0, 0, 1);
@@ -631,6 +641,56 @@ var render = function() {
             if (theta[head1Id2] <= -65 || theta[head1Id2] >= 65) nodding = !nodding;
         }
 
+        if (trick3) {
+            // Figure 1 jumps up and down
+            // Jumping motion
+            if (jumping) {
+                jumpHeight += 0.05;
+                // Bend legs as character reaches the peak
+                if (jumpHeight >= 1.5) { // Start bending near the peak
+                    theta[leftUpperLegId] = 180; 
+                    theta[rightUpperLegId] = 180;
+                    theta[leftLowerLegId] = 0;  
+                    theta[rightLowerLegId] = 0;
+                }
+            } else {
+                jumpHeight -= 0.05;
+                // Straighten legs when near ground level
+                if (jumpHeight <= 0.5) { // Start straightening as character lands
+                    theta[leftUpperLegId] = 0;
+                    theta[rightUpperLegId] = 0;
+                    theta[leftLowerLegId] = 0;
+                    theta[rightLowerLegId] = 0;
+                }
+            }
+
+            // Apply transformations to leg nodes after updating theta
+            initNodes(torsoId);
+            initNodes(leftUpperLegId);
+            initNodes(rightUpperLegId);
+            initNodes(leftLowerLegId);
+            initNodes(rightLowerLegId);
+
+            // Check for max height to reverse direction
+            if (jumpHeight >= 2.0) jumping = false; // Max jump height
+            if (jumpHeight <= 0.0) jumping = true;  // Return to ground level
+
+            // Figure 2 twists its torso
+            if (twisting) {
+                theta[torsoId2] += 1; // Adjust this for the speed of rotation
+            } else {
+                theta[torsoId2] -= 1;
+            }
+            initNodes(torsoId2);
+            if (theta[torsoId2] >= 30) twisting = false; // Max twist angle to the right
+            if (theta[torsoId2] <= -30) twisting = true; // Max twist angle to the left
+        }
+
+        materialDiffuse = vec4(1.0, 0.2, 0.8, 1.0); // Purple color for the first figure
+        diffuseProduct = mult(lightDiffuse, materialDiffuse);
+        gl.uniform4fv(diffuseProductLoc, flatten(diffuseProduct));
+        traverse(torsoId); // Render the first figure
+
         materialDiffuse = vec4(0.2, 0.2, 0.7, 1.0); // Blue color for the second figure
         diffuseProduct = mult(lightDiffuse, materialDiffuse);
         gl.uniform4fv(diffuseProductLoc, flatten(diffuseProduct));
@@ -641,15 +701,20 @@ var render = function() {
 
 function resetFigures() {
     // Reset trick one values
-    arms2 = vec3(1, 0, 0);
-    // reset trick two values
+    arms2 = vec3(0, 0, 1);
+    // Reset trick two values
     head2 = vec3(1, 0, 0);
-    legAxis = vec3(1, 0, 0);
+    legAxis = vec3(0, 0, 1);
+    // Reset trick three values
+    jumpHeight = 0;
+
+    // Other resets
+    armAxis = vec3(0, 0, 1);
 
     // reset figure angles and reinitialize nodes
     theta = [
-        0, 0, -180, 0, -180, 0, 180, 0, 180, 0, 0,
-        0, 0, -180, 0, -180, 0, 180, 0, 180, 0, 0
+        180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0,
+        180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0
     ];
     for(i=0; i<numNodes; i++) initNodes(i);
 }
