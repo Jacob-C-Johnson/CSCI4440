@@ -14,23 +14,26 @@ var modelViewMatrixLoc;
 // Trick 1 varibles
 var trick1 = false;
 var swinging = true;
+
 // Trick 2 varibles
 var trick2 = false;
 var nodding = true;
 var kicking = true;
+
 // Trick 3 varibles
 var trick3 = false;
 var twisting = true;
 var jumpHeight = 0;
 var jumping = true;
+
 // Trick 4 varibles
 var trick4 = false;
 
-// Changes to vec3 to adjust axis for different body parts
-var arms2 = vec3(0, 0, 1);
-var head2 = vec3(1, 0, 0);
-var legAxis = vec3(0, 0, 1);
-var armAxis = vec3(0, 0, 1);
+// Axis varibles for initNodes
+var arms2 = vec3(0, 0, 1); // figure 2 arms
+var head2 = vec3(1, 0, 0); // figure 2 head
+var legAxis = vec3(0, 0, 1); // figure 1 legs
+var armAxis = vec3(0, 0, 1); // figure 1 arms
 
 var vertices = [
 
@@ -44,7 +47,7 @@ var vertices = [
     vec4( 0.5, -0.5, -0.5, 1.0 )
 ];
 
-// figure 1
+// figure 1 theta indexes
 var torsoId = 0;
 var headId  = 1;
 var head1Id = 1;
@@ -58,7 +61,7 @@ var leftLowerLegId = 7;
 var rightUpperLegId = 8;
 var rightLowerLegId = 9;
 
-// Figure 2
+// Figure 2 theta indexes
 var torsoId2 = 11;
 var headId2 = 12;
 var head1Id2 = 12;
@@ -72,6 +75,7 @@ var leftLowerLegId2 = 18;
 var rightUpperLegId2 = 19;
 var rightLowerLegId2 = 20;
 
+// Both figures share same original sizing until scaling in the initNodes function
 var torsoHeight = 5.0;
 var torsoWidth = 1.0;
 var upperArmHeight = 2.0;
@@ -90,10 +94,10 @@ var numNodes = 22;
 var numAngles = 22;
 var angle = 0;
 
-// Adjusted theta values for figure 1 and 2
+// Theta positions for figure 1 and figure 2
 var theta = [
-    180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0,
-    180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0
+    180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0, // Figure 1 thetas
+    180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0  // Figure 2 thetas
 ];
 
 var stack = [];
@@ -101,7 +105,7 @@ var stack = [];
 // Array of nodes for figure 1 and figure 2
 var figure = [];
 
-// All things color related
+// Starting color and lighting values
 var normalsArray = [];
 var lightPosition = vec4(10.0, 5.0, 10.0, 0.0);
 var lightAmbient = vec4(0.2, 0.2, 0.2, 1.0);
@@ -113,6 +117,7 @@ var materialDiffuse = vec4(1.0, 0.8, 0.0, 1.0);
 var materialSpecular = vec4(1.0, 0.8, 0.0, 1.0);
 var materialShininess = 100.0;
 
+// Lighting varibles
 var ambientProduct, diffuseProduct, specularProduct;
 var lightPositionLoc, diffuseProductLoc, ambientProductLoc, specularProductLoc, shininessLoc;
 
@@ -122,19 +127,6 @@ var vBuffer;
 var modelViewLoc;
 
 var pointsArray = [];
-
-//-------------------------------------------
-
-function scale4(a, b, c) {
-   var result = mat4();
-   result[0] = a;
-   result[5] = b;
-   result[10] = c;
-   return result;
-}
-
-//--------------------------------------------
-
 
 function createNode(transform, render, sibling, child){
     var node = {
@@ -146,17 +138,16 @@ function createNode(transform, render, sibling, child){
     return node;
 }
 
-
 function initNodes(Id) {
 
     var m = mat4();
 
     switch(Id) {
 
+    // Figure 1 case statements
     case torsoId:
     
-    
-    m = mult(m,translate(-5.0, jumpHeight, 0.0)); // Move figure 1 to the left
+    m = mult(m,translate(-4.0, jumpHeight - 0.8, 0.0)); // Move figure 1 to the left and down to match fig 2
     m = mult(m, rotate(theta[torsoId], vec3(0, 1, 0)));
     m = mult(m,scale(0.5, 1.1, 0.5)); // Thin and tall scaling
 
@@ -179,28 +170,28 @@ function initNodes(Id) {
     case leftUpperArmId:
 
     m = translate(-(torsoWidth+upperArmWidth), 0.9*torsoHeight, 0.0);
-	  m = mult(m, rotate(theta[leftUpperArmId], armAxis));
+	  m = mult(m, rotate(theta[leftUpperArmId], armAxis)); // Axis parameter
     figure[leftUpperArmId] = createNode( m, leftUpperArm, rightUpperArmId, leftLowerArmId );
     break;
 
     case rightUpperArmId:
 
     m = translate(torsoWidth+upperArmWidth, 0.9*torsoHeight, 0.0);
-	  m = mult(m, rotate(theta[rightUpperArmId], armAxis));
+	  m = mult(m, rotate(theta[rightUpperArmId], armAxis)); // Axis parameter
     figure[rightUpperArmId] = createNode( m, rightUpperArm, leftUpperLegId, rightLowerArmId );
     break;
 
     case leftUpperLegId:
 
     m = translate(-(torsoWidth+upperLegWidth), 0.1*upperLegHeight, 0.0);
-	  m = mult(m , rotate(theta[leftUpperLegId], legAxis));
+	  m = mult(m , rotate(theta[leftUpperLegId], legAxis)); // Axis parameter
     figure[leftUpperLegId] = createNode( m, leftUpperLeg, rightUpperLegId, leftLowerLegId );
     break;
 
     case rightUpperLegId:
 
     m = translate(torsoWidth+upperLegWidth, 0.1*upperLegHeight, 0.0);
-	  m = mult(m, rotate(theta[rightUpperLegId], legAxis));
+	  m = mult(m, rotate(theta[rightUpperLegId], legAxis)); // Axis parameter
     figure[rightUpperLegId] = createNode( m, rightUpperLeg, null, rightLowerLegId );
     break;
 
@@ -234,7 +225,7 @@ function initNodes(Id) {
     
     // Figure 2 case statements
     case torsoId2:
-    m = mult(m,translate(5.0, 0.0, 0.0)); // Move figure 2 to the right
+    m = mult(m,translate(4.0, -2.0, 0.0)); // Move figure 2 to the right and down
     m = mult(m, rotate(theta[torsoId2], vec3(0, 1, 0)));
     m = mult(m,scale(1.2, 0.8, 1.2)); // Wide and short scaling
     figure[torsoId2] = createNode(m, torso, null, headId2);        
@@ -244,7 +235,7 @@ function initNodes(Id) {
     case head1Id2:
     case head2Id2:
     m = translate(0.0, torsoHeight+0.5*headHeight, 0.0);
-    m = mult(m, rotate(theta[head1Id2], head2))
+    m = mult(m, rotate(theta[head1Id2], head2)) // Axis parameter
     m = mult(m, rotate(theta[head2Id2], vec3(0, 1, 0)));
     m = mult(m, translate(0.0, -0.5*headHeight, 0.0));
     figure[headId2] = createNode( m, head, leftUpperArmId2, null);
@@ -252,37 +243,37 @@ function initNodes(Id) {
 
     case leftUpperArmId2:
     m = translate(-(torsoWidth+upperArmWidth), 0.9*torsoHeight, 0.0);
-    m = mult(m, rotate(theta[leftUpperArmId2], arms2));
+    m = mult(m, rotate(theta[leftUpperArmId2], arms2)); // Axis parameter
     figure[leftUpperArmId2] = createNode( m, leftUpperArm, rightUpperArmId2, leftLowerArmId2 );
     break;
 
     case rightUpperArmId2:
     m = translate(torsoWidth+upperArmWidth, 0.9*torsoHeight, 0.0);
-    m = mult(m, rotate(theta[rightUpperArmId2], arms2));
+    m = mult(m, rotate(theta[rightUpperArmId2], arms2)); // Axis parameter
     figure[rightUpperArmId2] = createNode( m, rightUpperArm, leftUpperLegId2, rightLowerArmId2 );
     break;
 
     case leftUpperLegId2:
     m = translate(-(torsoWidth+upperLegWidth), 0.1*upperLegHeight, 0.0);
-    m = mult(m , rotate(theta[leftUpperLegId2], arms2));
+    m = mult(m , rotate(theta[leftUpperLegId2], arms2)); // Axis parameter
     figure[leftUpperLegId2] = createNode( m, leftUpperLeg, rightUpperLegId2, leftLowerLegId2 );
     break;
 
     case rightUpperLegId2:
     m = translate(torsoWidth+upperLegWidth, 0.1*upperLegHeight, 0.0);
-    m = mult(m, rotate(theta[rightUpperLegId2], arms2));
+    m = mult(m, rotate(theta[rightUpperLegId2], arms2)); // Axis parameter
     figure[rightUpperLegId2] = createNode( m, rightUpperLeg, null, rightLowerLegId2 );
     break;
 
     case leftLowerArmId2:
     m = translate(0.0, upperArmHeight, 0.0);
-    m = mult(m, rotate(theta[leftLowerArmId2], arms2));
+    m = mult(m, rotate(theta[leftLowerArmId2], arms2)); // Axis parameter
     figure[leftLowerArmId2] = createNode( m, leftLowerArm, null, null );
     break;
 
     case rightLowerArmId2:
     m = translate(0.0, upperArmHeight, 0.0);
-    m = mult(m, rotate(theta[rightLowerArmId2], arms2));
+    m = mult(m, rotate(theta[rightLowerArmId2], arms2)); // Axis parameter
     figure[rightLowerArmId2] = createNode( m, rightLowerArm, null, null );
     break;
 
@@ -396,7 +387,7 @@ function rightLowerLeg() {
 }
 
 function quad(a, b, c, d) {
-    // From shaded cube
+    // From shaded cube calculate normal and push to normal array
     var t1 = subtract(vertices[b], vertices[a]);
     var t2 = subtract(vertices[c], vertices[b]);
     var normal = cross(t1, t2);
@@ -432,7 +423,7 @@ window.onload = function init() {
     if (!gl) { alert( "WebGL 2.0 isn't available" ); }
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 0.5, 0.5, 0.5, 0.5 );
+    gl.clearColor( 0.5, 0.6, 0.7, 1 ); // Canvas color is a light blue
 
     //
     //  Load shaders and initialize attribute buffers
@@ -492,57 +483,9 @@ window.onload = function init() {
     gl.uniform4fv(lightPositionLoc, flatten(lightPosition));
     gl.uniform1f(shininessLoc, materialShininess);
 
-    gl.uniformMatrix4fv( gl.getUniformLocation(program, "uProjectionMatrix"),
-       false, flatten(projectionMatrix));
-    
-    
-    document.getElementById("slider0").onchange = function(event) {
-        theta[torsoId ] = event.target.value;
-        initNodes(torsoId);
-    };
-    document.getElementById("slider1").onchange = function(event) {
-        theta[head1Id] = event.target.value;
-        initNodes(head1Id);
-    };
-    document.getElementById("slider2").onchange = function(event) {
-         theta[leftUpperArmId] = event.target.value;
-         initNodes(leftUpperArmId);
-    };
-    document.getElementById("slider3").onchange = function(event) {
-         theta[leftLowerArmId] =  event.target.value;
-         initNodes(leftLowerArmId);
-    };
+    gl.uniformMatrix4fv( gl.getUniformLocation(program, "uProjectionMatrix"), false, flatten(projectionMatrix));
 
-        document.getElementById("slider4").onchange = function(event) {
-        theta[rightUpperArmId] = event.target.value;
-        initNodes(rightUpperArmId);
-    };
-    document.getElementById("slider5").onchange = function(event) {
-         theta[rightLowerArmId] =  event.target.value;
-         initNodes(rightLowerArmId);
-    };
-        document.getElementById("slider6").onchange = function(event) {
-        theta[leftUpperLegId] = event.target.value;
-        initNodes(leftUpperLegId);
-    };
-    document.getElementById("slider7").onchange = function(event) {
-         theta[leftLowerLegId] = event.target.value;
-         initNodes(leftLowerLegId);
-    };
-    document.getElementById("slider8").onchange = function(event) {
-         theta[rightUpperLegId] =  event.target.value;
-         initNodes(rightUpperLegId);
-    };
-        document.getElementById("slider9").onchange = function(event) {
-        theta[rightLowerLegId] = event.target.value;
-        initNodes(rightLowerLegId);
-    };
-    document.getElementById("slider10").onchange = function(event) {
-         theta[head2Id] = event.target.value;
-         initNodes(head2Id);
-    };
-
-
+    // Button event listeners
     document.getElementById("reset").onclick = function() { 
         resetFigures();
         trick1 = false;
@@ -592,6 +535,7 @@ window.onload = function init() {
 var render = function() {
 
         gl.clear( gl.COLOR_BUFFER_BIT );
+
         if(trick1) { 
             // Spin the first figure
             theta[torsoId] = (theta[torsoId ] + 2) % 360;
@@ -599,19 +543,23 @@ var render = function() {
 
             // Spin the second figures arms in a wave motion
             if  (swinging) {
+                // Change axis to y axis for the wave motion
                 arms2 = vec3(0, 1, 0);
-                theta[leftUpperArmId2] += 2; // Move left upper arm up
-                theta[rightUpperArmId2] += 2; // Move right upper arm up
+                theta[leftUpperArmId2] += 2; 
+                theta[rightUpperArmId2] += 2;
+                // Change axis to z axis for the wave motion 
                 arms2 = vec3(0, 0, 1);
-                theta[leftLowerArmId2] += 2; // Move left lower arm down
-                theta[rightLowerArmId2] += 2; // Move right lower arm down
+                theta[leftLowerArmId2] += 2; 
+                theta[rightLowerArmId2] += 2; 
             } else {
+                // Change axis to y axis for the wave motion
                 arms2 = vec3(0, 1, 0);
-                theta[leftUpperArmId2] -= 2; // Move left upper arm down
-                theta[rightUpperArmId2] -= 2; // Move right upper arm down
+                theta[leftUpperArmId2] -= 2; 
+                theta[rightUpperArmId2] -= 2; 
+                // Change axis to z axis for the wave motion
                 arms2 = vec3(0, 0, 1);
-                theta[leftLowerArmId2] -= 2; // Move left lower arm up
-                theta[rightLowerArmId2] -= 2; // Move right lower arm up
+                theta[leftLowerArmId2] -= 2; 
+                theta[rightLowerArmId2] -= 2;
             }
 
             // Initialize each node after updating theta
@@ -620,7 +568,7 @@ var render = function() {
             initNodes(leftLowerArmId2);
             initNodes(rightLowerArmId2);
 
-            // If limits are met then switch directions
+            // Check for limit angles to reverse direction
             if (theta[leftUpperArmId2] <= -90 || theta[leftUpperArmId2] >= 90) swinging = !swinging;
             if (theta[leftLowerArmId2] >= 270 || theta[leftLowerArmId2] <= 90) swinging = !swinging;
 
@@ -628,7 +576,7 @@ var render = function() {
 
         if(trick2) {
             // Kick first figures legs side to side
-            legAxis = vec3(0, 0, 1);
+            legAxis = vec3(0, 0, 1); // Change leg axis to Z axis for the side to side motion
             if (kicking) {
                 theta[leftUpperLegId] -= 2;
                 theta[rightUpperLegId] -= 2;
@@ -637,10 +585,31 @@ var render = function() {
                 theta[leftUpperLegId] += 2;
                 theta[rightUpperLegId] += 2;
             }
+            // Apply transformations to leg nodes after updating theta
             initNodes(leftUpperLegId);
             initNodes(rightUpperLegId);
+
+            // Check for max angle to reverse direction
             if (theta[rightUpperLegId] <= 140) kicking = !kicking;
             if (theta[rightUpperLegId] >= 220) kicking = !kicking;
+
+            // Wave second figures arms
+            armAxis = vec3(0, 0, 1); // Adjust axis for arms
+            if (swinging) { 
+                theta[leftUpperArmId] -= 2;
+                theta[rightUpperArmId] -= 2;
+            }
+            else {
+                theta[leftUpperArmId] += 2;
+                theta[rightUpperArmId] += 2;
+            }
+            // Apply transformations to arm nodes after updating theta
+            initNodes(leftUpperArmId);
+            initNodes(rightUpperArmId);
+
+            // Check for max angle to reverse direction
+            if (theta[leftUpperArmId] <= 140) swinging = !swinging;
+            if (theta[leftUpperArmId] >= 220) swinging = !swinging;
             
 
             // Nod second figure's head back and fourth
@@ -651,54 +620,50 @@ var render = function() {
             else {
                 theta[head1Id2] -= 2;
             }
+
+            // Apply transformations to head nodes after updating theta
             initNodes(head1Id2);
+
+            // Check for max angle to reverse direction
             if (theta[head1Id2] <= -65 || theta[head1Id2] >= 65) nodding = !nodding;
         }
 
         if (trick3) {
-            // Target angles for bending and straightening the legs
-            const bendUpperLegAngle = 0;
-            const bendLowerLegAngle = -25;
-            const straightLegAngle = 180;
-
-            // Increment to control bending speed
-            const bendSpeed = 0.5; // Adjust this for faster or slower bending
-
-            // Jumping motion
+            // Figure 1 jumps
             if (jumping) {
                 jumpHeight += 0.05;
                 
                 // Gradually bend legs as character approaches the peak of the jump
                 if (jumpHeight >= 1.5) {
-                    if (theta[leftUpperLegId] > bendUpperLegAngle) {
-                        theta[leftUpperLegId] -= bendSpeed; // Bend upper leg
+                    if (theta[leftUpperLegId] > 0.0) {
+                        theta[leftUpperLegId] -= 0.5; // Bend upper leg
                     }
-                    if (theta[rightUpperLegId] > bendUpperLegAngle) {
-                        theta[rightUpperLegId] -= bendSpeed;
+                    if (theta[rightUpperLegId] > 0.0) {
+                        theta[rightUpperLegId] -= 0.5;
                     }
-                    if (theta[leftLowerLegId] > bendLowerLegAngle) {
-                        theta[leftLowerLegId] -= bendSpeed; // Bend lower leg
+                    if (theta[leftLowerLegId] > -25) {
+                        theta[leftLowerLegId] -= 0.5; // Bend lower leg
                     }
-                    if (theta[rightLowerLegId] > bendLowerLegAngle) {
-                        theta[rightLowerLegId] -= bendSpeed;
+                    if (theta[rightLowerLegId] > -25) {
+                        theta[rightLowerLegId] -= 0.5;
                     }
                 }
             } else {
                 jumpHeight -= 0.05;
-                
+    
                 // Gradually straighten legs as character returns to the ground
                 if (jumpHeight <= 0.5) {
-                    if (theta[leftUpperLegId] < straightLegAngle) {
-                        theta[leftUpperLegId] += bendSpeed; // Straighten upper leg
+                    if (theta[leftUpperLegId] < 180) {
+                        theta[leftUpperLegId] += 0.5; // Straighten upper leg
                     }
-                    if (theta[rightUpperLegId] < straightLegAngle) {
-                        theta[rightUpperLegId] += bendSpeed;
+                    if (theta[rightUpperLegId] < 180) {
+                        theta[rightUpperLegId] += 0.5;
                     }
-                    if (theta[leftLowerLegId] > straightLegAngle) {
-                        theta[leftLowerLegId] += bendSpeed; // Straighten lower leg
+                    if (theta[leftLowerLegId] > 180) {
+                        theta[leftLowerLegId] += 0.5; // Straighten lower leg
                     }
-                    if (theta[rightLowerLegId] > straightLegAngle) {
-                        theta[rightLowerLegId] += bendSpeed;
+                    if (theta[rightLowerLegId] > 180) {
+                        theta[rightLowerLegId] += 0.5;
                     }
                 }
             }
@@ -717,17 +682,22 @@ var render = function() {
 
             // Figure 2 twists its torso
             if (twisting) {
-                theta[torsoId2] += 1; // Adjust this for the speed of rotation
+                theta[torsoId2] += 1; 
             } else {
                 theta[torsoId2] -= 1;
             }
+
+            // Apply transformations to torso node after updating theta
             initNodes(torsoId2);
-            if (theta[torsoId2] >= 215) twisting = false; // Max twist angle to the right
-            if (theta[torsoId2] <= 145) twisting = true; // Max twist angle to the left
+
+            // Check for max angle to reverse direction
+            if (theta[torsoId2] >= 215) twisting = false; 
+            if (theta[torsoId2] <= 145) twisting = true; 
         }
 
         if (trick4) { 
             // figure 1 raises his arms  and starts jumping
+
             // left upper arm to 0
             if (theta[leftUpperArmId] > 0) { theta[leftUpperArmId] -= 0.5; }
             // right upper arm to 170
@@ -740,10 +710,12 @@ var render = function() {
             else {
                 jumpHeight -= 0.05;
             }
-            // Check for max height to reverse direction
-            if (jumpHeight >= 2.0) jumping = false; // Max jump height
-            if (jumpHeight <= 0.0) jumping = true;  // Return to ground level and prevent jump until arms are moved
 
+            // Check for max height to reverse direction
+            if (jumpHeight >= 2.0) jumping = false;
+            if (jumpHeight <= 0.0) jumping = true;
+
+            // Apply transformations to nodes after updating theta
             initNodes(torsoId);
             initNodes(leftUpperArmId);
             initNodes(rightUpperArmId);
@@ -752,19 +724,29 @@ var render = function() {
             arms2 = vec3(0, 0, 1); // Adjust axis for arms
             if (theta[leftUpperArmId2] > 135) { theta[leftUpperArmId2] -= 0.5; } // Cross left arm
             if (theta[rightUpperArmId2] < 225) { theta[rightUpperArmId2] += 0.5; } // Cross right arm
+
+            // Apply transformations to nodes after updating theta
             initNodes(leftUpperArmId2);
             initNodes(rightUpperArmId2);
-            head2 = vec3(0, 1, 0); // Head shake on Y axis to give the 'no' appearence
+
+            // Head shake on Y axis to give the 'no' appearence
+            head2 = vec3(0, 1, 0); 
             if (nodding){
                 theta[head1Id2] += 2;
             }
             else {
                 theta[head1Id2] -= 2;
             }
+
+            // Apply transformations to head nodes after updating theta
             initNodes(head1Id2);
+
+            // Check for max angle to reverse direction
             if (theta[head1Id2] <= -45 || theta[head1Id2] >= 45) nodding = !nodding;
 
         }
+
+        // Add Material colors and lighting to the figures
 
         materialDiffuse = vec4(1.0, 0.2, 0.8, 1.0); // Purple color for the first figure
         diffuseProduct = mult(lightDiffuse, materialDiffuse);
@@ -779,16 +761,13 @@ var render = function() {
         requestAnimationFrame(render);
 }
 
+// Reset all figures to their original positions
 function resetFigures() {
-    // Reset trick one values
+    // Reset axis varibles to originals
     arms2 = vec3(0, 0, 1);
-    // Reset trick two values
     head2 = vec3(1, 0, 0);
     legAxis = vec3(0, 0, 1);
-    // Reset trick three values
     jumpHeight = 0;
-
-    // Other resets
     armAxis = vec3(0, 0, 1);
 
     // reset figure angles and reinitialize nodes
