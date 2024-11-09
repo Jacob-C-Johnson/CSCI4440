@@ -23,6 +23,8 @@ var trick3 = false;
 var twisting = true;
 var jumpHeight = 0;
 var jumping = true;
+// Trick 4 varibles
+var trick4 = false;
 
 // Changes to vec3 to adjust axis for different body parts
 var arms2 = vec3(0, 0, 1);
@@ -546,12 +548,14 @@ window.onload = function init() {
         trick1 = false;
         trick2 = false;
         trick3 = false;
+        trick4 = false;
     };
 
     document.getElementById("trick1").onclick = function() {
         trick1 = !trick1;
         trick2 = false;
         trick3 = false;
+        trick4 = false;
         resetFigures();
     };
 
@@ -559,6 +563,7 @@ window.onload = function init() {
         trick1 = false;
         trick2 = !trick2;
         trick3 = false;
+        trick4 = false;
         resetFigures();
     };
 
@@ -566,8 +571,17 @@ window.onload = function init() {
         trick1 = false;
         trick2 = false;
         trick3 = !trick3;
+        trick4 = false;
         resetFigures();
     };
+
+    document.getElementById("trick4").onclick = function() {
+        trick1 = false;
+        trick2 = false;
+        trick3 = false;
+        trick4 = !trick4;
+        resetFigures();
+    }
 
     for(i=0; i<numNodes; i++) initNodes(i);
 
@@ -591,7 +605,6 @@ var render = function() {
                 arms2 = vec3(0, 0, 1);
                 theta[leftLowerArmId2] += 2; // Move left lower arm down
                 theta[rightLowerArmId2] += 2; // Move right lower arm down
-                console.log("swinging");
             } else {
                 arms2 = vec3(0, 1, 0);
                 theta[leftUpperArmId2] -= 2; // Move left upper arm down
@@ -599,7 +612,6 @@ var render = function() {
                 arms2 = vec3(0, 0, 1);
                 theta[leftLowerArmId2] -= 2; // Move left lower arm up
                 theta[rightLowerArmId2] -= 2; // Move right lower arm up
-                console.log("not swinging");
             }
 
             // Initialize each node after updating theta
@@ -712,6 +724,27 @@ var render = function() {
             initNodes(torsoId2);
             if (theta[torsoId2] >= 215) twisting = false; // Max twist angle to the right
             if (theta[torsoId2] <= 145) twisting = true; // Max twist angle to the left
+        }
+
+        if (trick4) { 
+            // figure 1
+
+            // figure 2 arms cross he shakes his head and rotates his torso
+            arms2 = vec3(0, 0, 1); // Adjust axis for arms
+            if (theta[leftUpperArmId2] > 135) { theta[leftUpperArmId2] -= 0.5; } // Cross left arm
+            if (theta[rightUpperArmId2] < 225) { theta[rightUpperArmId2] += 0.5; } // Cross right arm
+            initNodes(leftUpperArmId2);
+            initNodes(rightUpperArmId2);
+            head2 = vec3(0, 1, 0); // Head shake on Y axis to give the 'no' appearence
+            if (nodding){
+                theta[head1Id2] += 2;
+            }
+            else {
+                theta[head1Id2] -= 2;
+            }
+            initNodes(head1Id2);
+            if (theta[head1Id2] <= -45 || theta[head1Id2] >= 45) nodding = !nodding;
+
         }
 
         materialDiffuse = vec4(1.0, 0.2, 0.8, 1.0); // Purple color for the first figure
