@@ -727,7 +727,26 @@ var render = function() {
         }
 
         if (trick4) { 
-            // figure 1
+            // figure 1 raises his arms  and starts jumping
+            // left upper arm to 0
+            if (theta[leftUpperArmId] > 0) { theta[leftUpperArmId] -= 0.5; }
+            // right upper arm to 170
+            if (theta[rightUpperArmId] > 160) { theta[rightUpperArmId] -= 0.5; }
+            
+            // make figure jump
+            if (jumping) {
+                jumpHeight += 0.05;
+            }
+            else {
+                jumpHeight -= 0.05;
+            }
+            // Check for max height to reverse direction
+            if (jumpHeight >= 2.0) jumping = false; // Max jump height
+            if (jumpHeight <= 0.0) jumping = true;  // Return to ground level and prevent jump until arms are moved
+
+            initNodes(torsoId);
+            initNodes(leftUpperArmId);
+            initNodes(rightUpperArmId);
 
             // figure 2 arms cross he shakes his head and rotates his torso
             arms2 = vec3(0, 0, 1); // Adjust axis for arms
