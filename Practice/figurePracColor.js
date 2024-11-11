@@ -769,7 +769,7 @@ function resetFigures() {
     legAxis = vec3(0, 0, 1);
     jumpHeight = 0;
     armAxis = vec3(0, 0, 1);
-
+ 
     // reset figure angles and reinitialize nodes
     theta = [
         180, 0, 180, 0, 180, 0, 180, 0, 180, 0, 0,
