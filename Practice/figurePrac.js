@@ -25,6 +25,21 @@ var vertices = [
     vec4( 0.5, -0.5, -0.5, 1.0 )
 ];
 
+// Varibles
+var walking = false;
+var kicking = false;
+
+var turning = false;
+var twisting = false;
+
+var waving = false;
+var armWaving = false;
+
+var agree = false;
+var nodding = false;
+var disagree = false;
+var headaxis = vec3(1, 0, 0);
+
 
 var torsoId = 0;
 var headId  = 1;
@@ -114,7 +129,7 @@ function initNodes(Id) {
 
 
     m = translate(0.0, torsoHeight+0.5*headHeight, 0.0);
-	  m = mult(m, rotate(theta[head1Id], vec3(1, 0, 0)))
+	  m = mult(m, rotate(theta[head1Id], headaxis));
 	  m = mult(m, rotate(theta[head2Id], vec3(0, 1, 0)));
     m = mult(m, translate(0.0, -0.5*headHeight, 0.0));
     figure[headId] = createNode( m, head, leftUpperArmId, null);
@@ -124,14 +139,14 @@ function initNodes(Id) {
     case leftUpperArmId:
 
     m = translate(-(torsoWidth+upperArmWidth), 0.9*torsoHeight, 0.0);
-	  m = mult(m, rotate(theta[leftUpperArmId], vec3(1, 0, 0)));
+	  m = mult(m, rotate(theta[leftUpperArmId], vec3(0, 0, 1)));
     figure[leftUpperArmId] = createNode( m, leftUpperArm, rightUpperArmId, leftLowerArmId );
     break;
 
     case rightUpperArmId:
 
     m = translate(torsoWidth+upperArmWidth, 0.9*torsoHeight, 0.0);
-	  m = mult(m, rotate(theta[rightUpperArmId], vec3(1, 0, 0)));
+	  m = mult(m, rotate(theta[rightUpperArmId], vec3(0, 0, 1)));
     figure[rightUpperArmId] = createNode( m, rightUpperArm, leftUpperLegId, rightLowerArmId );
     break;
 
@@ -330,53 +345,6 @@ window.onload = function init() {
     gl.vertexAttribPointer( positionLoc, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( positionLoc );
 
-        document.getElementById("slider0").onchange = function(event) {
-        theta[torsoId ] = event.target.value;
-        initNodes(torsoId);
-    };
-        document.getElementById("slider1").onchange = function(event) {
-        theta[head1Id] = event.target.value;
-        initNodes(head1Id);
-    };
-
-    document.getElementById("slider2").onchange = function(event) {
-         theta[leftUpperArmId] = event.target.value;
-         initNodes(leftUpperArmId);
-    };
-    document.getElementById("slider3").onchange = function(event) {
-         theta[leftLowerArmId] =  event.target.value;
-         initNodes(leftLowerArmId);
-    };
-
-        document.getElementById("slider4").onchange = function(event) {
-        theta[rightUpperArmId] = event.target.value;
-        initNodes(rightUpperArmId);
-    };
-    document.getElementById("slider5").onchange = function(event) {
-         theta[rightLowerArmId] =  event.target.value;
-         initNodes(rightLowerArmId);
-    };
-        document.getElementById("slider6").onchange = function(event) {
-        theta[leftUpperLegId] = event.target.value;
-        initNodes(leftUpperLegId);
-    };
-    document.getElementById("slider7").onchange = function(event) {
-         theta[leftLowerLegId] = event.target.value;
-         initNodes(leftLowerLegId);
-    };
-    document.getElementById("slider8").onchange = function(event) {
-         theta[rightUpperLegId] =  event.target.value;
-         initNodes(rightUpperLegId);
-    };
-        document.getElementById("slider9").onchange = function(event) {
-        theta[rightLowerLegId] = event.target.value;
-        initNodes(rightLowerLegId);
-    };
-    document.getElementById("slider10").onchange = function(event) {
-         theta[head2Id] = event.target.value;
-         initNodes(head2Id);
-    };
-
     document.getElementById("reset").onclick = function() { 
         theta = [0, 0, 0, 0, 0, 0, 180, 0, 180, 0, 0];
         for(i=0; i<numNodes; i++) initNodes(i);
@@ -388,6 +356,28 @@ window.onload = function init() {
 
     document.getElementById("color").onclick = function() {
         
+    };
+
+    document.getElementById("walking").onclick = function() {
+        walking = !walking;
+    };
+
+    document.getElementById("turning").onclick = function() {
+        turning = !turning;
+    };
+
+    document.getElementById("Waving").onclick = function() {
+        waving = !waving;
+    };
+
+    document.getElementById("agree").onclick = function() {
+        agree = !agree;
+        disagree = false;
+    };
+
+    document.getElementById("disagree").onclick = function() {
+        disagree = !disagree;
+        agree = false;
     };
 
 
@@ -405,6 +395,94 @@ var render = function() {
             theta[torsoId ] = (theta[torsoId ] + 2) % 360;
             initNodes(torsoId);
         }
+
+        if(walking) {
+            if (kicking) {
+                theta[leftUpperLegId] -= 2;
+                theta[rightUpperLegId] += 2;
+            }
+            else {
+                theta[leftUpperLegId] += 2;
+                theta[rightUpperLegId] -= 2;
+            }
+            // Apply transformations to leg nodes after updating theta
+            initNodes(leftUpperLegId);
+            initNodes(rightUpperLegId);
+
+            // Check for max angle to reverse direction
+            if (theta[rightUpperLegId] <= 140) kicking = !kicking;
+            if (theta[rightUpperLegId] >= 220) kicking = !kicking;
+
+        }
+
+        if(turning) {
+            // Figure 2 twists its torso
+            if (twisting) {
+                theta[torsoId] += 1; 
+            } else {
+                theta[torsoId] -= 1;
+            }
+
+            // Apply transformations to torso node after updating theta
+            initNodes(torsoId);
+
+            // Check for max angle to reverse direction
+            if (theta[torsoId] <= -45) twisting = true; 
+            if (theta[torsoId] >= 45) twisting = false;
+        }
+
+        if(waving) {
+            if (armWaving) { 
+                theta[leftUpperArmId] += 2;
+                theta[rightUpperArmId] -= 2;
+            }
+            else {
+                theta[leftUpperArmId] -= 2;
+                theta[rightUpperArmId] += 2;
+            }
+            // Apply transformations to arm nodes after updating theta
+            initNodes(leftUpperArmId);
+            initNodes(rightUpperArmId);
+
+            // Check for max angle to reverse direction
+            if (theta[leftUpperArmId] <= -45) armWaving = !armWaving;
+            if (theta[leftUpperArmId] >= 0) armWaving = !armWaving;
+        }
+
+        if(agree) {
+            headaxis = vec3(1, 0, 0);
+            if (nodding){
+                theta[head1Id] += 2;
+            }
+            else {
+                theta[head1Id] -= 2;
+            }
+
+            // Apply transformations to head nodes after updating theta
+            initNodes(head1Id);
+
+            // Check for max angle to reverse direction
+            if (theta[head1Id] <= -65 || theta[head1Id] >= 65) nodding = !nodding;
+        }
+
+        if(disagree) {
+            headaxis = vec3(0, 1, 0);
+            if (nodding){
+                theta[head1Id] += 2;
+            }
+            else {
+                theta[head1Id] -= 2;
+            }
+
+            // Apply transformations to head nodes after updating theta
+            initNodes(head1Id);
+
+            // Check for max angle to reverse direction
+            if (theta[head1Id] <= -65 || theta[head1Id] >= 65) nodding = !nodding;
+        }
+
+        console.log(theta[head1Id]);
+
         traverse(torsoId);
         requestAnimationFrame(render);
 }
